@@ -1,0 +1,8 @@
+enabled = true
+include = ["."]
+
+name = "Template Mod"
+description = "This is a template mod!"
+version = "1.0"
+date = "27.05.2022"
+author = "Skyth"
