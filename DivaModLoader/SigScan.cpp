@@ -40,7 +40,8 @@ void* sigScan(const char* signature, const char* mask)
 }
 
 #define SIG_SCAN(x, ...) \
-    void* x##Addr; \
+    void* x(); \
+    void* x##Addr = x(); \
     void* x() \
     { \
         static const char* x##Data[] = { __VA_ARGS__ }; \
