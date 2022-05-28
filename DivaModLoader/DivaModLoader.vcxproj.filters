@@ -22,6 +22,7 @@
     <ClInclude Include="ModLoader.h" />
     <ClInclude Include="CodeLoader.h" />
     <ClInclude Include="Patches.h" />
+    <ClInclude Include="SigScan.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
@@ -31,6 +32,7 @@
     <ClCompile Include="CodeLoader.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Patches.cpp" />
+    <ClCompile Include="SigScan.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dependencies">

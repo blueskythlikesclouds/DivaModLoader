@@ -5,11 +5,13 @@
 #include "Types.h"
 #include "Utilities.h"
 
-HOOK(void, __fastcall, InitRomDirectoryPaths, 0x1402A2040)
+HOOK(void, __fastcall, InitRomDirectoryPaths, sigInitRomDirectoryPaths())
 {
     originalInitRomDirectoryPaths();
 
-    const auto romDirectoryPaths = (prj::vector<prj::string>*)0x1414B2768;
+    // Get the address of the vector from the lea instruction that loads it.
+    uint8_t* instrAddr = (uint8_t*)sigInitRomDirectoryPaths() + 0x30;
+    const auto romDirectoryPaths = (prj::vector<prj::string>*)(instrAddr + readUnalignedU32(instrAddr + 0x3) + 0x7);
 
     std::vector<std::string> modRomDirectoryPaths;
 

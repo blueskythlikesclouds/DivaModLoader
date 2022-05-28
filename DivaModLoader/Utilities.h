@@ -88,3 +88,9 @@ inline std::wstring getRelativePath(const std::wstring& filePath)
 
     return relativePath;
 }
+
+inline uint32_t readUnalignedU32(void* memory)
+{
+    uint8_t* p = (uint8_t*)memory;
+    return p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24);
+}

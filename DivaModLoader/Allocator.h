@@ -1,7 +1,9 @@
 ﻿#pragma once
 
-static inline FUNCTION_PTR(void*, __fastcall, operatorNew, 0x14097DEC0, size_t);
-static inline FUNCTION_PTR(void*, __fastcall, operatorDelete, 0x1409B8580, void*);
+#include "SigScan.h"
+
+static inline FUNCTION_PTR(void*, __fastcall, operatorNew, sigOperatorNew(), size_t);
+static inline FUNCTION_PTR(void*, __fastcall, operatorDelete, sigOperatorDelete(), void*);
 
 template <class T>
 class Allocator

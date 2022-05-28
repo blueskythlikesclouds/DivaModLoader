@@ -1,9 +1,10 @@
 ﻿#include "Patches.h"
+#include "SigScan.h"
 
 void Patches::init()
 {
     // Prevent SteamAPI_RestartAppIfNecessary.
-    WRITE_MEMORY(0x1406051F4, uint8_t, 0xEB);
+    WRITE_MEMORY((uint8_t*)sigInitSteamAPIManager() + 0x24, uint8_t, 0xEB);
 
     // Create steam_appid.txt so the patch can actually function properly.
     {
