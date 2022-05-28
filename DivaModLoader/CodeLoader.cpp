@@ -1,11 +1,13 @@
-﻿#include "Context.h"
+﻿#include "CodeLoader.h"
+
+#include "Context.h"
 #include "Utilities.h"
 
 typedef void DllEvent();
 
-std::vector<std::wstring> dllFilePaths;
+std::vector<std::wstring> CodeLoader::dllFilePaths;
 
-void initCodeLoader()
+void CodeLoader::init()
 {
     processFilePaths(dllFilePaths, true);
 

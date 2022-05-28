@@ -18,14 +18,19 @@
     <ClInclude Include="Dependencies\Helpers.h">
       <Filter>Dependencies</Filter>
     </ClInclude>
+    <ClInclude Include="Config.h" />
+    <ClInclude Include="ModLoader.h" />
+    <ClInclude Include="CodeLoader.h" />
+    <ClInclude Include="Patches.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="Pch.cpp" />
     <ClCompile Include="Context.cpp" />
-    <ClCompile Include="Steam.cpp" />
     <ClCompile Include="ModLoader.cpp" />
     <ClCompile Include="CodeLoader.cpp" />
+    <ClCompile Include="Config.cpp" />
+    <ClCompile Include="Patches.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Dependencies">
@@ -40,9 +45,6 @@
     <Filter Include="Dependencies\Detours\include">
       <UniqueIdentifier>{93708190-5906-4db7-b13b-dff27f636afb}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Dependencies\Detours\lib\x86">
-      <UniqueIdentifier>{18983a62-1a77-4f06-b903-ba42ba572101}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Dependencies\Detours\lib\x64">
       <UniqueIdentifier>{737983fc-3a8e-4a50-b3bc-7bd1e5145ad5}</UniqueIdentifier>
     </Filter>
@@ -54,19 +56,10 @@
     <Library Include="Dependencies\Detours\lib\x64\syelog.lib">
       <Filter>Dependencies\Detours\lib\x64</Filter>
     </Library>
-    <Library Include="Dependencies\Detours\lib\x86\detours.lib">
-      <Filter>Dependencies\Detours\lib\x86</Filter>
-    </Library>
-    <Library Include="Dependencies\Detours\lib\x86\syelog.lib">
-      <Filter>Dependencies\Detours\lib\x86</Filter>
-    </Library>
   </ItemGroup>
   <ItemGroup>
     <None Include="Dependencies\Detours\lib\x64\detours.pdb">
       <Filter>Dependencies\Detours\lib\x64</Filter>
-    </None>
-    <None Include="Dependencies\Detours\lib\x86\detours.pdb">
-      <Filter>Dependencies\Detours\lib\x86</Filter>
     </None>
   </ItemGroup>
 </Project>

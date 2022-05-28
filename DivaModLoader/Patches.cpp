@@ -1,6 +1,6 @@
-#include "Context.h"
+﻿#include "Patches.h"
 
-void initSteam()
+void Patches::init()
 {
     // Prevent SteamAPI_RestartAppIfNecessary.
     WRITE_MEMORY(0x1406051F4, uint8_t, 0xEB);

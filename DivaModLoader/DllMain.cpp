@@ -7,7 +7,7 @@ BOOL WINAPI DllMain(_In_ HINSTANCE instance, _In_ DWORD reason, _In_ LPVOID rese
 	switch (reason)
 	{
 	case DLL_PROCESS_ATTACH:
-		init();
+		Context::init();
 		break;
 
 	case DLL_PROCESS_DETACH:

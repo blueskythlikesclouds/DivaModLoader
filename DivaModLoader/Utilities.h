@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+/// Removes directories that don't exist, and tries to make their paths relative if they are contained within the current directory.
 inline void processDirectoryPaths(std::vector<std::string>& directoryPaths, const bool reverse)
 {
     std::vector<std::string> newDirectoryPaths;
@@ -32,6 +33,7 @@ inline void processDirectoryPaths(std::vector<std::string>& directoryPaths, cons
     std::swap(directoryPaths, newDirectoryPaths);
 }
 
+/// Removes files that don't exist, and tries to make their paths relative if they are contained within the current directory.
 inline void processFilePaths(std::vector<std::wstring>& filePaths, const bool reverse)
 {
     std::vector<std::wstring> newFilePaths;
@@ -61,6 +63,7 @@ inline std::wstring convertMultiByteToWideChar(const std::string& value)
     return std::wstring(wideChar);
 }
 
+/// Gets relative path if it's contained within the current directory.
 inline std::string getRelativePath(const std::string& filePath)
 {
     std::string relativePath = std::filesystem::relative(filePath, std::filesystem::current_path()).string();
@@ -73,6 +76,7 @@ inline std::string getRelativePath(const std::string& filePath)
     return relativePath;
 }
 
+/// Gets relative path if it's contained within the current directory.
 inline std::wstring getRelativePath(const std::wstring& filePath)
 {
     std::wstring relativePath = std::filesystem::relative(filePath, std::filesystem::current_path()).wstring();
