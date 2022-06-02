@@ -2,6 +2,8 @@
 
 extern bool sigValid;
 
+extern void* sigWinMain(); // 0x1402C2F30
+
 extern void* sigOperatorNew(); // 0x14097DEC0
 extern void* sigOperatorDelete(); // 0x1409B8580
 

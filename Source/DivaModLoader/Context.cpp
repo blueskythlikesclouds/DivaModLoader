@@ -5,14 +5,15 @@
 #include "Patches.h"
 #include "SigScan.h"
 
-void Context::init()
+HOOK(int, WINAPI, WinMain, sigWinMain(), HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-    if (!sigValid)
-    {
-        MessageBoxW(nullptr, L"Failed to install mod loader (game version is possibly unsupported)", L"DIVA Mod Loader", MB_ICONERROR);
-        return;
-    }
+    Context::initCore();
 
+    return originalWinMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
+}
+
+void Context::initCore()
+{
     if (!Config::init())
         return;
 
@@ -27,4 +28,15 @@ void Context::init()
     Patches::init();
     ModLoader::init();
     CodeLoader::init();
+}
+
+void Context::init()
+{
+    if (!sigValid)
+    {
+        MessageBoxW(nullptr, L"Failed to install mod loader (game version is possibly unsupported)", L"DIVA Mod Loader", MB_ICONERROR);
+        return;
+    }
+
+    INSTALL_HOOK(WinMain);
 }
