@@ -90,12 +90,25 @@ void ModLoader::init()
 {
     LOG("Mods: \"%s\"", getRelativePath(Config::modsDirectoryPath).c_str())
 
-    for (auto& modDirectory : std::filesystem::directory_iterator(Config::modsDirectoryPath))
+    if (Config::priorityPaths.size() > 0)
     {
-        if (std::filesystem::is_directory(modDirectory))
-            initMod(modDirectory.path());
+        LOG("Using priority array")
+        for (auto& path : Config::priorityPaths)
+        {
+            const std::string modDirectory = Config::modsDirectoryPath + "\\" + path;
+            if (std::filesystem::is_directory(modDirectory))
+                initMod(modDirectory);
+        }
     }
-
+    else
+    {
+        LOG("Using alphanumeric folder name order for priority")
+        for (auto& modDirectory : std::filesystem::directory_iterator(Config::modsDirectoryPath))
+        {
+            if (std::filesystem::is_directory(modDirectory))
+                initMod(modDirectory.path());
+        }
+    }
     if (!modDirectoryPaths.empty())
         INSTALL_HOOK(InitRomDirectoryPaths);
 }
