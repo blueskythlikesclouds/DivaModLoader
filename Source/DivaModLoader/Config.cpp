@@ -2,11 +2,11 @@
 
 bool Config::enableDebugConsole;
 std::string Config::modsDirectoryPath;
+std::vector<std::string> Config::priorityPaths;
 
 bool Config::init()
 {
     toml::table config;
-
     try
     {
         config = toml::parse_file("config.toml");
@@ -24,6 +24,16 @@ bool Config::init()
 
     enableDebugConsole = config["console"].value_or(false);
     modsDirectoryPath = config["mods"].value_or("mods");
+
+    if (toml::array* priorityArr = config["priority"].as_array())
+    {
+        for (auto& pathElem : *priorityArr)
+        {
+            const std::string path = pathElem.value_or("");
+            if (!path.empty())
+                priorityPaths.push_back(path);
+        }
+    }
 
     return true;
 }
