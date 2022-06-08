@@ -90,9 +90,10 @@ void ModLoader::init()
 {
     LOG("Mods: \"%s\"", getRelativePath(Config::modsDirectoryPath).c_str())
 
-    if (Config::priorityPaths.size() > 0)
+    if (!Config::priorityPaths.empty())
     {
-        LOG("Using priority array")
+        LOG(" Using priority array")
+
         for (auto& path : Config::priorityPaths)
         {
             const std::string modDirectory = Config::modsDirectoryPath + "\\" + path;
@@ -102,7 +103,8 @@ void ModLoader::init()
     }
     else
     {
-        LOG("Using alphanumeric folder name order for priority")
+        LOG(" Using alphanumeric folder name order for priority")
+
         for (auto& modDirectory : std::filesystem::directory_iterator(Config::modsDirectoryPath))
         {
             if (std::filesystem::is_directory(modDirectory))

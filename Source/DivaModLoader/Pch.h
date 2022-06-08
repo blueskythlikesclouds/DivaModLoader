@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 #undef _ITERATOR_DEBUG_LEVEL
 #pragma pop_macro("_ITERATOR_DEBUG_LEVEL")

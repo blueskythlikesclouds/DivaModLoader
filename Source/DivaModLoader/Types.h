@@ -11,4 +11,7 @@ namespace prj
 
     template<typename T>
     using vector = std::vector<T, Allocator<T>>;
+
+    template<typename T>
+    using list = std::list<T, Allocator<T>>;
 }

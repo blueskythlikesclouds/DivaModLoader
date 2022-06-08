@@ -11,6 +11,7 @@
     <ClInclude Include="CodeLoader.h" />
     <ClInclude Include="Patches.h" />
     <ClInclude Include="SigScan.h" />
+    <ClInclude Include="DatabaseLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DllMain.cpp" />
@@ -21,5 +22,6 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Patches.cpp" />
     <ClCompile Include="SigScan.cpp" />
+    <ClCompile Include="DatabaseLoader.cpp" />
   </ItemGroup>
 </Project>

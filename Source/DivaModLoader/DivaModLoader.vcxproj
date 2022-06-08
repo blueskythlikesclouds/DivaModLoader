@@ -103,6 +103,7 @@
     <ClInclude Include="CodeLoader.h" />
     <ClInclude Include="Config.h" />
     <ClInclude Include="Context.h" />
+    <ClInclude Include="DatabaseLoader.h" />
     <ClInclude Include="ModLoader.h" />
     <ClInclude Include="Patches.h" />
     <ClInclude Include="Pch.h" />
@@ -114,6 +115,7 @@
     <ClCompile Include="CodeLoader.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Context.cpp" />
+    <ClCompile Include="DatabaseLoader.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="ModLoader.cpp" />
     <ClCompile Include="Patches.cpp" />
