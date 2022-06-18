@@ -1,16 +1,24 @@
 ﻿#pragma once
 
+// Signature scan in specified memory region
+extern void* sigScan(const char* signature, const char* mask, size_t sigSize, void* memory, size_t memorySize);
+
+// Signature scan in current process
+extern void* sigScan(const char* signature, const char* mask, void* hint = nullptr);
+
+// Automatically scanned signatures, these are expected to exist in all game versions
+// sigValid is going to be false if any automatic signature scan fails
 extern bool sigValid;
 
-extern void* sig_scrt_common_main_seh();
-extern void* sigWinMain(); // 0x1402C2F30
+extern void* sigCrtMain();
+extern void* sigWinMain();
 
-extern void* sigOperatorNew(); // 0x14097DEC0
-extern void* sigOperatorDelete(); // 0x1409B8580
+extern void* sigOperatorNew();
+extern void* sigOperatorDelete();
 
-extern void* sigInitRomDirectoryPaths(); // 0x1402A2040
+extern void* sigInitRomDirectoryPaths();
 
-extern void* sigInitSteamAPIManager(); // 0x1406051D0
+extern void* sigInitSteamAPIManager();
 
-extern void* sigResolveFilePath(); // 0x1402A5030
-extern void* sigInitMdataMgr(); // 0x140442D50
+extern void* sigResolveFilePath();
+extern void* sigInitMdataMgr();

@@ -26,11 +26,11 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
     return TRUE;
 }
 
-HOOK(int, WINAPI, _scrt_common_main_seh, sig_scrt_common_main_seh(), HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+HOOK(int, WINAPI, CrtMain, sigCrtMain(), HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     Context::init();
 
-    return original_scrt_common_main_seh(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
+    return originalCrtMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
 }
 
 HOOK(int, WINAPI, WinMain, sigWinMain(), HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
@@ -48,7 +48,7 @@ void Context::preInit()
         return;
     }
 
-    INSTALL_HOOK(_scrt_common_main_seh);
+    INSTALL_HOOK(CrtMain);
 }
 
 void Context::init()
