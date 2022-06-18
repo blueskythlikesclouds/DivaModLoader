@@ -116,7 +116,6 @@
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="DatabaseLoader.cpp" />
-    <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="ModLoader.cpp" />
     <ClCompile Include="Patches.cpp" />
     <ClCompile Include="Pch.cpp">

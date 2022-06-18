@@ -13,6 +13,7 @@
 class Context
 {
 public:
-    static void initCore();
+    static void preInit();
     static void init();
+    static void postInit();
 };

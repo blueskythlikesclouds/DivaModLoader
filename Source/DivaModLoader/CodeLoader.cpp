@@ -3,11 +3,15 @@
 #include "Context.h"
 #include "Utilities.h"
 
-constexpr const char* INIT_FUNC_NAMES[] = { "Init", "init" };
-constexpr const char* POST_INIT_FUNC_NAMES[] = { "PostInit", "postInit", "post_init" };
-constexpr const char* ON_FRAME_FUNC_NAMES[] = { "OnFrame", "onFrame", "on_frame" };
+constexpr const char* PRE_INIT_FUNC_NAMES[] = { "PreInit", "preInit", "pre_init" }; // Called in _scrt_common_main_seh
+constexpr const char* INIT_FUNC_NAMES[] = { "Init", "init" }; // Called in WinMain
+constexpr const char* POST_INIT_FUNC_NAMES[] = { "PostInit", "postInit", "post_init" }; // Called in WinMain after every Init
+constexpr const char* ON_FRAME_FUNC_NAMES[] = { "OnFrame", "onFrame", "on_frame" }; // Called every frame before present
 
 std::vector<std::wstring> CodeLoader::dllFilePaths;
+
+std::vector<CodeEvent*> CodeLoader::initEvents;
+std::vector<CodeEvent*> CodeLoader::postInitEvents;
 std::vector<CodeEvent*> CodeLoader::onFrameEvents;
 
 VTABLE_HOOK(HRESULT, WINAPI, IDXGISwapChain, Present, UINT SyncInterval, UINT Flags)
@@ -51,15 +55,15 @@ HOOK(HRESULT, WINAPI, D3D11CreateDeviceAndSwapChain, PROC_ADDRESS("d3d11.dll", "
 
     return result;
 }
- 
+
+// Gets called during _scrt_common_main_seh.
+// Loads DLL mods and calls their "PreInit" functions.
 void CodeLoader::init()
 {
     processFilePaths(dllFilePaths, true);
     
     if (dllFilePaths.empty())
         return;
-
-    std::vector<CodeEvent*> postInitEvents;
 
     WCHAR currentDirectory[0x400];
     WCHAR dllDirectory[0x400];
@@ -95,12 +99,20 @@ void CodeLoader::init()
 
         LOG(" - %ls", getRelativePath(dllFilePath).c_str())
 
+        for (auto& preInitFuncName : PRE_INIT_FUNC_NAMES)
+        {
+            const FARPROC preInitEvent = GetProcAddress(module, preInitFuncName);
+
+            if (preInitEvent)
+                ((CodeEvent*)preInitEvent)();
+        }
+
         for (auto& initFuncName : INIT_FUNC_NAMES)
         {
             const FARPROC initEvent = GetProcAddress(module, initFuncName);
 
             if (initEvent)
-                ((CodeEvent*)initEvent)();
+                initEvents.push_back((CodeEvent*)initEvent);
         }
 
         for (auto& postInitFuncName : POST_INIT_FUNC_NAMES)
@@ -120,12 +132,20 @@ void CodeLoader::init()
         }
     }
 
-    for (auto& codeEvent : postInitEvents)
-        codeEvent();
-
     SetCurrentDirectoryW(currentDirectory);
     SetDllDirectoryW(dllDirectory);
 
     if (!onFrameEvents.empty())
         INSTALL_HOOK(D3D11CreateDeviceAndSwapChain);
+}
+
+// Gets called during WinMain.
+// Calls "Init" and "PostInit" functions of DLL mods.
+void CodeLoader::postInit()
+{
+    for (auto& initEvent : initEvents)
+        initEvent();
+
+    for (auto& postInitEvent : postInitEvents)
+        postInitEvent();
 }
