@@ -12,6 +12,7 @@
     <ClInclude Include="Patches.h" />
     <ClInclude Include="SigScan.h" />
     <ClInclude Include="DatabaseLoader.h" />
+    <ClInclude Include="FileLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Pch.cpp" />
@@ -22,5 +23,6 @@
     <ClCompile Include="Patches.cpp" />
     <ClCompile Include="SigScan.cpp" />
     <ClCompile Include="DatabaseLoader.cpp" />
+    <ClCompile Include="FileLoader.cpp" />
   </ItemGroup>
 </Project>

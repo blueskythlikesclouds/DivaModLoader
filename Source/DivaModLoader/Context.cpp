@@ -2,6 +2,7 @@
 
 #include "CodeLoader.h"
 #include "DatabaseLoader.h"
+#include "FileLoader.h"
 #include "ModLoader.h"
 #include "Patches.h"
 #include "SigScan.h"
@@ -67,6 +68,7 @@ void Context::init()
     Patches::init();
     ModLoader::init();
     CodeLoader::init();
+    FileLoader::init();
 
     INSTALL_HOOK(WinMain);
 }

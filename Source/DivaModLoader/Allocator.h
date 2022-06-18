@@ -4,6 +4,7 @@
 
 static inline FUNCTION_PTR(void*, __fastcall, operatorNew, sigOperatorNew(), size_t);
 static inline FUNCTION_PTR(void*, __fastcall, operatorDelete, sigOperatorDelete(), void*);
+static inline FUNCTION_PTR(void*, __fastcall, heapCMallocAllocate, sigHeapCMallocAllocate(), size_t type, size_t size, const char* name);
 
 template <class T>
 class Allocator

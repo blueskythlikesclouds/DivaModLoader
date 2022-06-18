@@ -15,6 +15,7 @@ extern void* sigWinMain();
 
 extern void* sigOperatorNew();
 extern void* sigOperatorDelete();
+extern void* sigHeapCMallocAllocate();
 
 extern void* sigInitRomDirectoryPaths();
 
@@ -22,3 +23,5 @@ extern void* sigInitSteamAPIManager();
 
 extern void* sigResolveFilePath();
 extern void* sigInitMdataMgr();
+
+extern void* sigLoadFileFromCpk();
