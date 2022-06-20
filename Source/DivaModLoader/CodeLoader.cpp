@@ -3,6 +3,25 @@
 #include "Context.h"
 #include "Utilities.h"
 
+// Stores the current directory, and reverts it back to the original when it exits the current scope.
+struct CurrentDirectoryGuard
+{
+    WCHAR currentDirectory[0x400];
+    WCHAR dllDirectory[0x400];
+
+    CurrentDirectoryGuard()
+    {
+        GetCurrentDirectoryW(_countof(currentDirectory), currentDirectory);
+        GetDllDirectoryW(_countof(dllDirectory), dllDirectory);
+    }
+
+    ~CurrentDirectoryGuard()
+    {
+        SetCurrentDirectoryW(currentDirectory);
+        SetDllDirectoryW(dllDirectory);
+    }
+};
+
 constexpr const char* PRE_INIT_FUNC_NAMES[] = { "PreInit", "preInit", "pre_init" }; // Called in _scrt_common_main_seh
 constexpr const char* INIT_FUNC_NAMES[] = { "Init", "init" }; // Called in WinMain
 constexpr const char* POST_INIT_FUNC_NAMES[] = { "PostInit", "postInit", "post_init" }; // Called in WinMain after every Init
@@ -10,8 +29,8 @@ constexpr const char* ON_FRAME_FUNC_NAMES[] = { "OnFrame", "onFrame", "on_frame"
 
 std::vector<std::wstring> CodeLoader::dllFilePaths;
 
-std::vector<CodeEvent*> CodeLoader::initEvents;
-std::vector<CodeEvent*> CodeLoader::postInitEvents;
+std::vector<CodeEventPair> CodeLoader::initEvents;
+std::vector<CodeEventPair> CodeLoader::postInitEvents;
 std::vector<CodeEvent*> CodeLoader::onFrameEvents;
 
 VTABLE_HOOK(HRESULT, WINAPI, IDXGISwapChain, Present, UINT SyncInterval, UINT Flags)
@@ -56,6 +75,14 @@ HOOK(HRESULT, WINAPI, D3D11CreateDeviceAndSwapChain, PROC_ADDRESS("d3d11.dll", "
     return result;
 }
 
+void CodeEventPair::run() const
+{
+    SetCurrentDirectoryW(directoryPath.c_str());
+    SetDllDirectoryW(directoryPath.c_str());
+
+    event();
+}
+
 // Gets called during _scrt_common_main_seh.
 // Loads DLL mods and calls their "PreInit" functions.
 void CodeLoader::init()
@@ -65,13 +92,9 @@ void CodeLoader::init()
     if (dllFilePaths.empty())
         return;
 
-    WCHAR currentDirectory[0x400];
-    WCHAR dllDirectory[0x400];
-
-    GetCurrentDirectoryW(_countof(currentDirectory), currentDirectory);
-    GetDllDirectoryW(_countof(dllDirectory), dllDirectory);
-
     LOG("DLL:")
+
+    CurrentDirectoryGuard guard;
 
     for (auto& dllFilePath : dllFilePaths)
     {
@@ -112,7 +135,7 @@ void CodeLoader::init()
             const FARPROC initEvent = GetProcAddress(module, initFuncName);
 
             if (initEvent)
-                initEvents.push_back((CodeEvent*)initEvent);
+                initEvents.push_back({ directoryPath, (CodeEvent*)initEvent });
         }
 
         for (auto& postInitFuncName : POST_INIT_FUNC_NAMES)
@@ -120,7 +143,7 @@ void CodeLoader::init()
             const FARPROC postInitEvent = GetProcAddress(module, postInitFuncName);
 
             if (postInitEvent)
-                postInitEvents.push_back((CodeEvent*)postInitEvent);
+                postInitEvents.push_back({ directoryPath, (CodeEvent*)postInitEvent });
         }
 
         for (auto& onFrameFuncName : ON_FRAME_FUNC_NAMES)
@@ -132,9 +155,6 @@ void CodeLoader::init()
         }
     }
 
-    SetCurrentDirectoryW(currentDirectory);
-    SetDllDirectoryW(dllDirectory);
-
     if (!onFrameEvents.empty())
         INSTALL_HOOK(D3D11CreateDeviceAndSwapChain);
 }
@@ -143,9 +163,11 @@ void CodeLoader::init()
 // Calls "Init" and "PostInit" functions of DLL mods.
 void CodeLoader::postInit()
 {
+    CurrentDirectoryGuard guard;
+
     for (auto& initEvent : initEvents)
-        initEvent();
+        initEvent.run();
 
     for (auto& postInitEvent : postInitEvents)
-        postInitEvent();
+        postInitEvent.run();
 }
