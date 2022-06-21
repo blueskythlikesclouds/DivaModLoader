@@ -47,7 +47,7 @@ HOOK(size_t, __fastcall, ResolveFilePath, sigResolveFilePath(), prj::string& fil
 }
 
 // Custom string arrays.
-std::unordered_map<size_t, std::string> strArray;
+std::map<int, std::string> strArray;
 
 void addStrArray(const toml::table* table)
 {
@@ -64,7 +64,7 @@ void addStrArray(const toml::table* table)
         const int id = strtol(key.data(), &end, 10);
 
         if (end && strArray.find(id) == strArray.end())
-            strArray[id] = value.value_or("YOU FORGOT QUOTATION MARKS");
+            strArray.insert({ id, value.value_or("YOU FORGOT QUOTATION MARKS") });
     }
 }
 
@@ -106,13 +106,17 @@ HOOK(void, __fastcall, LoadStrArray, sigLoadStrArray())
         loadStrArray(dir + "/rom/lang2/mod_str_array.toml");
 }
 
-HOOK(const char*, __fastcall, GetStr, sigGetStr(), int id)
+// RDX, R8 and R9 in the argument list are required to prevent memory corruptions.
+// I am not sure why this is required, but it is the only way to prevent crashing.
+
+HOOK(const char*, __fastcall, GetStr, sigGetStr(), const int id, void* RDX, void* R8, void* R9)
 {
     const auto str = strArray.find(id);
+    
     if (str != strArray.end())
         return str->second.c_str();
 
-    return originalGetStr(id);
+    return originalGetStr(id, RDX, R8, R9);
 }
 
 void DatabaseLoader::init()
