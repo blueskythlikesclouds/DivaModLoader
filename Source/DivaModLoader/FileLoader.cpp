@@ -16,7 +16,7 @@ HOOK(CpkFileHandle*, __fastcall, OpenFileFromCpk, sigLoadFileFromCpk(), const ch
 {
     // I don't know what these arguments mean, but they are utilized by files
     // that we are interested in manually loading.
-    if (a2 && a3)
+    if (a2 && a3 && !strstr(fileName, "osage_play_data_tmp")) // Ignore osage_play_data_tmp because it's treated as a text file for some reason.
     {
         FILE* file = fopen(fileName, "rb");
         if (file)
@@ -31,10 +31,13 @@ HOOK(CpkFileHandle*, __fastcall, OpenFileFromCpk, sigLoadFileFromCpk(), const ch
             fseek(file, 0, SEEK_END);
             handle->dataSize = ftell(file);
             fseek(file, 0, SEEK_SET);
-            handle->data = heapCMallocAllocate(5, handle->dataSize, "cri file extract buffer");
-            fread(handle->data, handle->dataSize, 1, file);
-            fclose(file);
 
+            handle->data = heapCMallocAllocate(5, handle->dataSize + 1, "cri file extract buffer");
+
+            fread(handle->data, handle->dataSize, 1, file);
+            *((uint8_t*)handle->data + handle->dataSize) = 0;
+
+            fclose(file);
             return handle;
         }
     }
