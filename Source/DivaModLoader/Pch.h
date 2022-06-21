@@ -22,6 +22,7 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <unordered_map>
 
 #undef _ITERATOR_DEBUG_LEVEL
 #pragma pop_macro("_ITERATOR_DEBUG_LEVEL")

@@ -25,3 +25,6 @@ extern void* sigResolveFilePath();
 extern void* sigInitMdataMgr();
 
 extern void* sigLoadFileFromCpk();
+
+extern void* sigLoadStrArray();
+extern void* sigGetStr();

@@ -1,5 +1,6 @@
 ﻿#include "DatabaseLoader.h"
 
+#include "Context.h"
 #include "ModLoader.h"
 #include "Types.h"
 #include "Utilities.h"
@@ -45,6 +46,75 @@ HOOK(size_t, __fastcall, ResolveFilePath, sigResolveFilePath(), prj::string& fil
     return originalResolveFilePath(filePath, a2);
 }
 
+// Custom string arrays.
+std::unordered_map<size_t, std::string> strArray;
+
+void addStrArray(const toml::table* table)
+{
+    if (!table)
+        return;
+
+    for (auto&& [key, value] : *table)
+    {
+        if (value.is_table())
+            continue;
+
+        // Convert to integer and check for success.
+        char* end = nullptr;
+        const int id = strtol(key.data(), &end, 10);
+
+        if (end && strArray.find(id) == strArray.end())
+            strArray[id] = value.value_or("YOU FORGOT QUOTATION MARKS");
+    }
+}
+
+void loadStrArray(const std::string& filePath)
+{
+    if (!std::filesystem::exists(filePath))
+        return;
+
+    toml::table table;
+
+    try
+    {
+        table = toml::parse_file(filePath);
+    }
+    catch (std::exception& exception)
+    {
+        char text[0x400];
+        sprintf(text, "Failed to parse \"%s\".\nDid you forget to add quotation marks to your string?\n\nDetails:\n%s", 
+            std::filesystem::path(filePath).lexically_normal().string().c_str(), exception.what());
+
+        LOG("%s", text)
+        MessageBoxA(nullptr, text, "DIVA Mod Loader", MB_ICONERROR);
+
+        return;
+    }
+
+    uint8_t* instrAddr = (uint8_t*)sigLoadStrArray() + 0x55;
+    FUNCTION_PTR(const char*, __fastcall, getLangDir, instrAddr + readUnalignedU32(instrAddr + 0x1) + 0x5);
+
+    addStrArray(table.get_as<toml::table>(strstr(getLangDir(), "/") + 1));
+    addStrArray(&table);
+}
+
+HOOK(void, __fastcall, LoadStrArray, sigLoadStrArray())
+{
+    originalLoadStrArray();
+
+    for (auto& dir : ModLoader::modDirectoryPaths)
+        loadStrArray(dir + "/rom/lang2/mod_str_array.toml");
+}
+
+HOOK(const char*, __fastcall, GetStr, sigGetStr(), int id)
+{
+    const auto str = strArray.find(id);
+    if (str != strArray.end())
+        return str->second.c_str();
+
+    return originalGetStr(id);
+}
+
 void DatabaseLoader::init()
 {
     INSTALL_HOOK(ResolveFilePath);
@@ -68,5 +138,7 @@ void DatabaseLoader::init()
 
         list.push_back(path);
     }
-}
 
+    INSTALL_HOOK(LoadStrArray);
+    INSTALL_HOOK(GetStr);
+}
