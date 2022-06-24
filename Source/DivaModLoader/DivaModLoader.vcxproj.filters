@@ -25,4 +25,7 @@
     <ClCompile Include="DatabaseLoader.cpp" />
     <ClCompile Include="FileLoader.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <MASM Include="DatabaseLoaderImp.asm" />
+  </ItemGroup>
 </Project>

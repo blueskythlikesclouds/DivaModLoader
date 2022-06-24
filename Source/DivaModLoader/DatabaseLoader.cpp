@@ -106,17 +106,17 @@ HOOK(void, __fastcall, LoadStrArray, sigLoadStrArray())
         loadStrArray(dir + "/rom/lang2/mod_str_array.toml");
 }
 
-// RDX, R8 and R9 in the argument list are required to prevent memory corruptions.
-// I am not sure why this is required, but it is the only way to prevent crashing.
+// This function isn't implemented here. See DatabaseLoaderImp.asm for details.
+HOOK(const char*, __fastcall, GetStr, sigGetStr(), const int id);
 
-HOOK(const char*, __fastcall, GetStr, sigGetStr(), const int id, void* RDX, void* R8, void* R9)
+const char* getStrImp(const int id)
 {
     const auto str = strArray.find(id);
-    
+
     if (str != strArray.end())
         return str->second.c_str();
 
-    return originalGetStr(id, RDX, R8, R9);
+    return originalGetStr(id);
 }
 
 void DatabaseLoader::init()
