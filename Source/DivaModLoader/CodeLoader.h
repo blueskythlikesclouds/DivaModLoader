@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 typedef void CodeEvent();
+typedef void OnFrameEvent(IDXGISwapChain* swapChain);
 
 struct CodeEventPair
 {
@@ -17,7 +18,7 @@ public:
 
     static std::vector<CodeEventPair> initEvents;
     static std::vector<CodeEventPair> postInitEvents;
-    static std::vector<CodeEvent*> onFrameEvents;
+    static std::vector<OnFrameEvent*> onFrameEvents;
 
     static void init();
     static void postInit();

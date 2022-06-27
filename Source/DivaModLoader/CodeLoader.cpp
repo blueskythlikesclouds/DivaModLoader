@@ -31,12 +31,12 @@ std::vector<std::wstring> CodeLoader::dllFilePaths;
 
 std::vector<CodeEventPair> CodeLoader::initEvents;
 std::vector<CodeEventPair> CodeLoader::postInitEvents;
-std::vector<CodeEvent*> CodeLoader::onFrameEvents;
+std::vector<OnFrameEvent*> CodeLoader::onFrameEvents;
 
 VTABLE_HOOK(HRESULT, WINAPI, IDXGISwapChain, Present, UINT SyncInterval, UINT Flags)
 {
     for (auto& onFrameEvent : CodeLoader::onFrameEvents)
-        onFrameEvent();
+        onFrameEvent(This);
 
     return originalIDXGISwapChainPresent(This, SyncInterval, Flags);
 }
@@ -151,7 +151,7 @@ void CodeLoader::init()
             const FARPROC onFrameEvent = GetProcAddress(module, onFrameFuncName);
 
             if (onFrameEvent)
-                onFrameEvents.push_back((CodeEvent*)onFrameEvent);
+                onFrameEvents.push_back((OnFrameEvent*)onFrameEvent);
         }
     }
 
