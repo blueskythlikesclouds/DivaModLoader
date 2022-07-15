@@ -110,13 +110,16 @@ extern "C"
 
     void __declspec(dllexport) PostInit() {}
 
-    void __declspec(dllexport) OnFrame() {}
+    void __declspec(dllexport) D3DInit(IDXGISwapChain* swapChain, ID3D11Device* device, ID3D11DeviceContext* deviceContext) {}
+
+    void __declspec(dllexport) OnFrame(IDXGISwapChain* swapChain) {}	
 }
 ```
 
 * **PreInit** is called before any of the game's global variables are initialized. You only need to use this if you want to hook into C++ static initializers.  
 * **Init** is called after the game's global variables are initialized. This is likely going to be the function where you initialize your mod and inject code. You cannot hook into C++ static initializers from this function as they have been called already.  
-* **PostInit** is called after every DLL mod is initialized. This is a pretty niche use case and you probably won't need it.  
+* **PostInit** is called after every DLL mod is initialized. This is a pretty niche use case and you probably won't need it.
+* **D3DInit** is called in **D3D11CreateDeviceAndSwapChain** after the device gets initialized. You could use this (along with **OnFrame**) to hook ImGui into the game.
 * **OnFrame** is called before the game's frame is presented to the screen. You can use this to execute logic per frame.  
 
 You can omit functions that you don't need to use. They are not required to be declared.
