@@ -25,12 +25,14 @@ struct CurrentDirectoryGuard
 constexpr const char* PRE_INIT_FUNC_NAMES[] = { "PreInit", "preInit", "pre_init" }; // Called in _scrt_common_main_seh
 constexpr const char* INIT_FUNC_NAMES[] = { "Init", "init" }; // Called in WinMain
 constexpr const char* POST_INIT_FUNC_NAMES[] = { "PostInit", "postInit", "post_init" }; // Called in WinMain after every Init
+constexpr const char* D3D_INIT_FUNC_NAMES[] = { "D3DInit", "d3dInit", "d3d_init" }; // Called in D3D11CreateDeviceAndSwapChain
 constexpr const char* ON_FRAME_FUNC_NAMES[] = { "OnFrame", "onFrame", "on_frame" }; // Called every frame before present
 
 std::vector<std::wstring> CodeLoader::dllFilePaths;
 
-std::vector<CodeEventPair> CodeLoader::initEvents;
-std::vector<CodeEventPair> CodeLoader::postInitEvents;
+std::vector<EventPair<InitEvent>> CodeLoader::initEvents;
+std::vector<EventPair<InitEvent>> CodeLoader::postInitEvents;
+std::vector<EventPair<D3DInitEvent>> CodeLoader::d3dInitEvents;
 std::vector<OnFrameEvent*> CodeLoader::onFrameEvents;
 
 VTABLE_HOOK(HRESULT, WINAPI, IDXGISwapChain, Present, UINT SyncInterval, UINT Flags)
@@ -43,16 +45,16 @@ VTABLE_HOOK(HRESULT, WINAPI, IDXGISwapChain, Present, UINT SyncInterval, UINT Fl
 
 HOOK(HRESULT, WINAPI, D3D11CreateDeviceAndSwapChain, PROC_ADDRESS("d3d11.dll", "D3D11CreateDeviceAndSwapChain"),
     IDXGIAdapter* pAdapter,
-    D3D_DRIVER_TYPE DriverType, 
-    HMODULE Software, 
+    D3D_DRIVER_TYPE DriverType,
+    HMODULE Software,
     UINT Flags,
-    const D3D_FEATURE_LEVEL* pFeatureLevels, 
-    UINT FeatureLevels, 
-    UINT SDKVersion, 
-    const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc, 
-    IDXGISwapChain** ppSwapChain, 
-    ID3D11Device** ppDevice, 
-    D3D_FEATURE_LEVEL* pFeatureLevel, 
+    const D3D_FEATURE_LEVEL* pFeatureLevels,
+    UINT FeatureLevels,
+    UINT SDKVersion,
+    const DXGI_SWAP_CHAIN_DESC* pSwapChainDesc,
+    IDXGISwapChain** ppSwapChain,
+    ID3D11Device** ppDevice,
+    D3D_FEATURE_LEVEL* pFeatureLevel,
     ID3D11DeviceContext** ppImmediateContext)
 {
     const HRESULT result = originalD3D11CreateDeviceAndSwapChain(
@@ -69,18 +71,22 @@ HOOK(HRESULT, WINAPI, D3D11CreateDeviceAndSwapChain, PROC_ADDRESS("d3d11.dll", "
         pFeatureLevel,
         ppImmediateContext);
 
-    if (SUCCEEDED(result) && ppSwapChain && *ppSwapChain)
+    if (FAILED(result))
+        return result;
+
+    if (!CodeLoader::d3dInitEvents.empty() && ppSwapChain && *ppSwapChain && 
+        ppDevice && *ppDevice && *ppImmediateContext && ppImmediateContext)
+    {
+        CurrentDirectoryGuard guard;
+
+        for (auto& event : CodeLoader::d3dInitEvents)
+            event.run(*ppSwapChain, *ppDevice, *ppImmediateContext);
+    }
+
+    if (!CodeLoader::onFrameEvents.empty() && ppSwapChain && *ppSwapChain)
         INSTALL_VTABLE_HOOK(IDXGISwapChain, *ppSwapChain, Present, 8);
 
     return result;
-}
-
-void CodeEventPair::run() const
-{
-    SetCurrentDirectoryW(directoryPath.c_str());
-    SetDllDirectoryW(directoryPath.c_str());
-
-    event();
 }
 
 // Gets called during _scrt_common_main_seh.
@@ -127,7 +133,7 @@ void CodeLoader::init()
             const FARPROC preInitEvent = GetProcAddress(module, preInitFuncName);
 
             if (preInitEvent)
-                ((CodeEvent*)preInitEvent)();
+                ((InitEvent*)preInitEvent)();
         }
 
         for (auto& initFuncName : INIT_FUNC_NAMES)
@@ -135,7 +141,7 @@ void CodeLoader::init()
             const FARPROC initEvent = GetProcAddress(module, initFuncName);
 
             if (initEvent)
-                initEvents.push_back({ directoryPath, (CodeEvent*)initEvent });
+                initEvents.push_back({ directoryPath, (InitEvent*)initEvent });
         }
 
         for (auto& postInitFuncName : POST_INIT_FUNC_NAMES)
@@ -143,7 +149,15 @@ void CodeLoader::init()
             const FARPROC postInitEvent = GetProcAddress(module, postInitFuncName);
 
             if (postInitEvent)
-                postInitEvents.push_back({ directoryPath, (CodeEvent*)postInitEvent });
+                postInitEvents.push_back({ directoryPath, (InitEvent*)postInitEvent });
+        }
+
+        for (auto& d3dInitFuncName : D3D_INIT_FUNC_NAMES)
+        {
+            const FARPROC d3dInitEvent = GetProcAddress(module, d3dInitFuncName);
+
+            if (d3dInitEvent)
+                d3dInitEvents.push_back({ directoryPath, (D3DInitEvent*)d3dInitEvent });
         }
 
         for (auto& onFrameFuncName : ON_FRAME_FUNC_NAMES)
@@ -155,7 +169,7 @@ void CodeLoader::init()
         }
     }
 
-    if (!onFrameEvents.empty())
+    if (!d3dInitEvents.empty() || !onFrameEvents.empty())
         INSTALL_HOOK(D3D11CreateDeviceAndSwapChain);
 }
 
