@@ -1,7 +1,8 @@
 # DIVA Mod Loader
 
-DIVA Mod Loader (DML) is a mod loader for Hatsune Miku: Project DIVA Mega Mix+. It allows you to make file replacement mods without hassle and provides extra features for convenience.  
-You can use [DIVA Mod Manager (DMM)](https://github.com/TekkaGB/DivaModManager) as a GUI front-end for DML.
+DIVA Mod Loader (DML) is a mod loader for Hatsune Miku: Project DIVA Mega Mix+. It allows you to make file replacement mods without hassle and provides extra features for convenience.
+
+You can use [DIVA Mod Manager (DMM)](https://github.com/TekkaGB/DivaModManager) or [d4m](https://github.com/Brod8362/d4m) as a front-end for DML.
 
 ## Installation
 
@@ -49,7 +50,7 @@ author = "Skyth"
 * **include**: A list of directories to scan when doing external file replacements. Most mods only need `"."` as the value. If your mod only contains a DLL file without replacing any files, you should remove this property.  
 * **dll**: A list of DLL files to load. You should remove this property if your mod doesn't utilize any DLL files, otherwise you are going to receive errors at startup.  
 
-Rest of the properties should be self-explanatory and are not used by DML. They are only used by DMM to display information about the mod if it wasn't downloaded from GameBanana. However, please make sure to use version/date values in the same format as the given example.
+Rest of the properties should be self-explanatory and are not used by DML. They are only used by DMM or d4m to display information about the mod if it wasn't downloaded from GameBanana or DIVA Mod Archive. However, please make sure to use version/date values in the same format as the given example.
 
 ### File Replacement
 
