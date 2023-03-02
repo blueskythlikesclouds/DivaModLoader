@@ -29,6 +29,7 @@ public:
     static std::vector<EventPair<InitEvent>> postInitEvents;
     static std::vector<EventPair<D3DInitEvent>> d3dInitEvents;
     static std::vector<OnFrameEvent*> onFrameEvents;
+    static std::vector<OnFrameEvent*> onResizeEvents;
 
     static void init();
     static void postInit();
