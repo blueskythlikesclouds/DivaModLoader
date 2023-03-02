@@ -114,6 +114,8 @@ extern "C"
     void __declspec(dllexport) D3DInit(IDXGISwapChain* swapChain, ID3D11Device* device, ID3D11DeviceContext* deviceContext) {}
 
     void __declspec(dllexport) OnFrame(IDXGISwapChain* swapChain) {}	
+
+    void __declspec(dllexport) OnResize(IDXGISwapChain* swapChain) {}
 }
 ```
 
@@ -122,6 +124,7 @@ extern "C"
 * **PostInit** is called after every DLL mod is initialized. This is a pretty niche use case and you probably won't need it.
 * **D3DInit** is called in **D3D11CreateDeviceAndSwapChain** after the device gets initialized. You could use this (along with **OnFrame**) to hook ImGui into the game.
 * **OnFrame** is called before the game's frame is presented to the screen. You can use this to execute logic per frame.  
+* **OnResize** is called after the game's buffers are resized.
 
 You can omit functions that you don't need to use. They are not required to be declared.
 

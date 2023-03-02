@@ -27,6 +27,7 @@ constexpr const char* INIT_FUNC_NAMES[] = { "Init", "init" }; // Called in WinMa
 constexpr const char* POST_INIT_FUNC_NAMES[] = { "PostInit", "postInit", "post_init" }; // Called in WinMain after every Init
 constexpr const char* D3D_INIT_FUNC_NAMES[] = { "D3DInit", "d3dInit", "d3d_init" }; // Called in D3D11CreateDeviceAndSwapChain
 constexpr const char* ON_FRAME_FUNC_NAMES[] = { "OnFrame", "onFrame", "on_frame" }; // Called every frame before present
+constexpr const char* ON_RESIZE_FUNC_NAMES[] = { "OnResize", "onResize", "on_resize" }; // Called after the buffers are resized
 
 std::vector<std::wstring> CodeLoader::dllFilePaths;
 
@@ -34,6 +35,7 @@ std::vector<EventPair<InitEvent>> CodeLoader::initEvents;
 std::vector<EventPair<InitEvent>> CodeLoader::postInitEvents;
 std::vector<EventPair<D3DInitEvent>> CodeLoader::d3dInitEvents;
 std::vector<OnFrameEvent*> CodeLoader::onFrameEvents;
+std::vector<OnFrameEvent*> CodeLoader::onResizeEvents;
 
 VTABLE_HOOK(HRESULT, WINAPI, IDXGISwapChain, Present, UINT SyncInterval, UINT Flags)
 {
@@ -41,6 +43,16 @@ VTABLE_HOOK(HRESULT, WINAPI, IDXGISwapChain, Present, UINT SyncInterval, UINT Fl
         onFrameEvent(This);
 
     return originalIDXGISwapChainPresent(This, SyncInterval, Flags);
+}
+
+VTABLE_HOOK(HRESULT, WINAPI, IDXGISwapChain, ResizeBuffers, UINT BufferCount, UINT Width, UINT Height, DXGI_FORMAT NewFormat, UINT SwapChainFlags)
+{
+    HRESULT res = originalIDXGISwapChainResizeBuffers(This, BufferCount, Width, Height, NewFormat, SwapChainFlags);
+
+    for (auto& onResizeEvent : CodeLoader::onResizeEvenets)
+        onResizeEvent(This);
+
+    return res;
 }
 
 HOOK(HRESULT, WINAPI, D3D11CreateDeviceAndSwapChain, PROC_ADDRESS("d3d11.dll", "D3D11CreateDeviceAndSwapChain"),
@@ -85,6 +97,9 @@ HOOK(HRESULT, WINAPI, D3D11CreateDeviceAndSwapChain, PROC_ADDRESS("d3d11.dll", "
 
     if (!CodeLoader::onFrameEvents.empty() && ppSwapChain && *ppSwapChain)
         INSTALL_VTABLE_HOOK(IDXGISwapChain, *ppSwapChain, Present, 8);
+
+    if (!CodeLoader::onResizeEvenets.empty() && ppSwapChain && *ppSwapChain)
+        INSTALL_VTABLE_HOOK(IDXGISwapChain, *ppSwapChain, ResizeBuffers, 13);
 
     return result;
 }
@@ -167,9 +182,17 @@ void CodeLoader::init()
             if (onFrameEvent)
                 onFrameEvents.push_back((OnFrameEvent*)onFrameEvent);
         }
+
+        for (auto& onResizeFuncName : ON_RESIZE_FUNC_NAMES)
+        {
+            const FARPOC onResizeEvent = GetProcAddress(module, onResizeFuncName);
+
+            if (onResizeEvent)
+                onResizeEvents.push_back((OnFrameEvent*)onResizeEvent);
+        }
     }
 
-    if (!d3dInitEvents.empty() || !onFrameEvents.empty())
+    if (!d3dInitEvents.empty() || !onFrameEvents.empty() || !onResizeEvenets.empty())
         INSTALL_HOOK(D3D11CreateDeviceAndSwapChain);
 }
 
