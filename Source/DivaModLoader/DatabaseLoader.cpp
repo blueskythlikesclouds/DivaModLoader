@@ -48,8 +48,9 @@ HOOK(size_t, __fastcall, ResolveFilePath, sigResolveFilePath(), prj::string& fil
 
 // Custom string arrays.
 std::map<int, std::string> strArray;
+std::map<int, std::string> moduleNames;
 
-void addStrArray(const toml::table* table)
+void addStrArray(const toml::table* table, std::map<int, std::string> *strArray)
 {
     if (!table)
         return;
@@ -63,8 +64,8 @@ void addStrArray(const toml::table* table)
         char* end = nullptr;
         const int id = strtol(key.data(), &end, 10);
 
-        if (end && strArray.find(id) == strArray.end())
-            strArray.insert({ id, value.value_or("YOU FORGOT QUOTATION MARKS") });
+        if (end && strArray->find(id) == strArray->end())
+            strArray->insert({ id, value.value_or("YOU FORGOT QUOTATION MARKS") });
     }
 }
 
@@ -94,8 +95,12 @@ void loadStrArray(const std::string& filePath)
     uint8_t* instrAddr = (uint8_t*)sigLoadStrArray() + 0x55;
     FUNCTION_PTR(const char*, __fastcall, getLangDir, instrAddr + readUnalignedU32(instrAddr + 0x1) + 0x5);
 
-    addStrArray(table.get_as<toml::table>(strstr(getLangDir(), "/") + 1));
-    addStrArray(&table);
+    toml::table *langTable = table.get_as<toml::table>(strstr(getLangDir(), "/") + 1);
+    addStrArray(langTable, &strArray);
+    addStrArray(&table, &strArray);
+
+    addStrArray(langTable->get_as<toml::table>("module"), &moduleNames);
+    addStrArray(table.get_as<toml::table>("module"), &moduleNames);
 }
 
 HOOK(void, __fastcall, LoadStrArray, sigLoadStrArray())
@@ -108,6 +113,8 @@ HOOK(void, __fastcall, LoadStrArray, sigLoadStrArray())
 
 // This function isn't implemented here. See DatabaseLoaderImp.asm for details.
 HOOK(const char*, __fastcall, GetStr, sigGetStr(), const int id);
+extern "C" FUNCTION_PTR(void, __fastcall, GetModuleNameJumpBack, sigGetModuleName() + readUnalignedU32(sigGetModuleName() + 1) + 5 + 0x4E0 + 5);
+HOOK(const char*, __fastcall, GetModuleName, sigGetModuleName() + readUnalignedU32(sigGetModuleName() + 1) + 5 + 0x4E0, const int id);
 
 const char* getStrImp(const int id)
 {
@@ -117,6 +124,17 @@ const char* getStrImp(const int id)
         return str->second.c_str();
 
     return originalGetStr(id);
+}
+
+const char* getModuleNameImp(const int id)
+{
+    const int moduleId = id - 0x95;
+    const auto str = moduleNames.find(moduleId);
+
+    if (str != moduleNames.end())
+        return str->second.c_str();
+
+    return getStrImp(id);
 }
 
 void DatabaseLoader::init()
