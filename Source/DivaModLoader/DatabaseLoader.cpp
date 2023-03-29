@@ -49,8 +49,9 @@ HOOK(size_t, __fastcall, ResolveFilePath, sigResolveFilePath(), prj::string& fil
 // Custom string arrays.
 std::map<int, std::string> strArray;
 std::map<int, std::string> moduleNames;
+std::map<int, std::string> customiseNames;
 
-void addStrArray(const toml::table* table, std::map<int, std::string> *strArray)
+void addStrArray(const toml::table* table, std::map<int, std::string> &strArray)
 {
     if (!table)
         return;
@@ -96,11 +97,15 @@ void loadStrArray(const std::string& filePath)
     FUNCTION_PTR(const char*, __fastcall, getLangDir, instrAddr + readUnalignedU32(instrAddr + 0x1) + 0x5);
 
     toml::table *langTable = table.get_as<toml::table>(strstr(getLangDir(), "/") + 1);
-    addStrArray(langTable, &strArray);
-    addStrArray(&table, &strArray);
 
-    addStrArray(langTable->get_as<toml::table>("module"), &moduleNames);
-    addStrArray(table.get_as<toml::table>("module"), &moduleNames);
+    addStrArray(langTable, strArray);
+    addStrArray(&table, strArray);
+
+    addStrArray(langTable->get_as<toml::table>("module"), moduleNames);
+    addStrArray(table.get_as<toml::table>("module"), moduleNames);
+
+    addStrArray(langTable->get_as<toml::table>("customise"), customiseNames);
+    addStrArray(table.get_as<toml::table>("customise"), customiseNames);
 }
 
 HOOK(void, __fastcall, LoadStrArray, sigLoadStrArray())
@@ -113,8 +118,10 @@ HOOK(void, __fastcall, LoadStrArray, sigLoadStrArray())
 
 // This function isn't implemented here. See DatabaseLoaderImp.asm for details.
 HOOK(const char*, __fastcall, GetStr, sigGetStr(), const int id);
-extern "C" FUNCTION_PTR(void, __fastcall, GetModuleNameJumpBack, sigGetModuleName() + readUnalignedU32(sigGetModuleName() + 1) + 5 + 0x4E0 + 5);
+extern "C" FUNCTION_PTR(void, __fastcall, GetModuleNameRetrunAddress, sigGetModuleName() + readUnalignedU32(sigGetModuleName() + 1) + 5 + 0x4E0 + 5);
 HOOK(const char*, __fastcall, GetModuleName, sigGetModuleName() + readUnalignedU32(sigGetModuleName() + 1) + 5 + 0x4E0, const int id);
+extern "C" FUNCTION_PTR(void, __fastcall, GetCustomiseNameReturnAddress, sigGetCustomiseName() + 6 + 5);
+HOOK(const char*, __fastcall, GetCustomiseNameReturn, sigGetCustomiseName() + 6, const int id);
 
 const char* getStrImp(const int id)
 {
@@ -132,6 +139,17 @@ const char* getModuleNameImp(const int id)
     const auto str = moduleNames.find(moduleId);
 
     if (str != moduleNames.end())
+        return str->second.c_str();
+
+    return getStrImp(id);
+}
+
+const char* getCustomiseNameImp(const int id)
+{
+    const int customiseId = id - 0x3A8;
+    const auto str = customiseNames.find(customiseId);
+
+    if (str != customiseNames.end())
         return str->second.c_str();
 
     return getStrImp(id);
@@ -163,4 +181,6 @@ void DatabaseLoader::init()
 
     INSTALL_HOOK(LoadStrArray);
     INSTALL_HOOK(GetStr);
+    INSTALL_HOOK(GetModuleName);
+    INSTALL_HOOK(GetCustomiseNameReturn);
 }
