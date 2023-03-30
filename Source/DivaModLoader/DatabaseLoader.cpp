@@ -51,7 +51,7 @@ std::map<int, std::string> strArray;
 std::map<int, std::string> moduleNames;
 std::map<int, std::string> customiseNames;
 
-void addStrArray(const toml::table* table, std::map<int, std::string> &strArray)
+void addStrArray(const toml::table* table, std::map<int, std::string>& strArray)
 {
     if (!table)
         return;
@@ -65,8 +65,8 @@ void addStrArray(const toml::table* table, std::map<int, std::string> &strArray)
         char* end = nullptr;
         const int id = strtol(key.data(), &end, 10);
 
-        if (end && strArray->find(id) == strArray->end())
-            strArray->insert({ id, value.value_or("YOU FORGOT QUOTATION MARKS") });
+        if (end && strArray.find(id) == strArray.end())
+            strArray.insert({ id, value.value_or("YOU FORGOT QUOTATION MARKS") });
     }
 }
 
