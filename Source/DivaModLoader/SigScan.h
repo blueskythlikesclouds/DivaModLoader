@@ -28,3 +28,5 @@ extern void* sigLoadFileFromCpk();
 
 extern void* sigLoadStrArray();
 extern void* sigGetStr();
+extern void* sigGetModuleName();
+extern void* sigGetCustomiseName();
