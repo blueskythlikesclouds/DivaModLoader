@@ -133,9 +133,8 @@ const char* getStrImp(const int id)
     return originalGetStr(id);
 }
 
-const char* getModuleNameImp(const int id)
+const char* getModuleNameImp(const int id, const int moduleId)
 {
-    const int moduleId = id - 0x95;
     const auto str = moduleNames.find(moduleId);
 
     if (str != moduleNames.end())
@@ -144,9 +143,8 @@ const char* getModuleNameImp(const int id)
     return getStrImp(id);
 }
 
-const char* getCustomiseNameImp(const int id)
+const char* getCustomiseNameImp(const int id, const int customiseId)
 {
-    const int customiseId = id - 0x3A8;
     const auto str = customiseNames.find(customiseId);
 
     if (str != customiseNames.end())

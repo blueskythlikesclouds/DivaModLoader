@@ -41,7 +41,7 @@
 
 public ?implOfGetStr@@YAPEBDH@Z
 
-?getModuleNameImp@@YAPEBDH@Z proto
+?getModuleNameImp@@YAPEBDHH@Z proto
 GetModuleNameRetrunAddress proto
 
 ?implOfGetModuleName@@YAPEBDH@Z:
@@ -58,7 +58,8 @@ GetModuleNameRetrunAddress proto
     push r14
     push r15
 
-    call ?getModuleNameImp@@YAPEBDH@Z
+    mov edx, dword ptr [r8 + r15]
+    call ?getModuleNameImp@@YAPEBDHH@Z
 
     pop r15
     pop r14
@@ -77,7 +78,7 @@ GetModuleNameRetrunAddress proto
 
 public ?implOfGetModuleName@@YAPEBDH@Z
 
-?getCustomiseNameImp@@YAPEBDH@Z proto
+?getCustomiseNameImp@@YAPEBDHH@Z proto
 GetCustomiseNameReturnAddress proto
 
 ?implOfGetCustomiseNameReturn@@YAPEBDH@Z:
@@ -94,7 +95,8 @@ GetCustomiseNameReturnAddress proto
     push r14
     push r15
 
-    call ?getCustomiseNameImp@@YAPEBDH@Z
+    mov rdx, rbx
+    call ?getCustomiseNameImp@@YAPEBDHH@Z
 
     pop r15
     pop r14
