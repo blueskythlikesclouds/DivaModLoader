@@ -13,6 +13,7 @@
     <ClInclude Include="SigScan.h" />
     <ClInclude Include="DatabaseLoader.h" />
     <ClInclude Include="FileLoader.h" />
+    <ClInclude Include="StrArray.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Pch.cpp" />
@@ -24,8 +25,9 @@
     <ClCompile Include="SigScan.cpp" />
     <ClCompile Include="DatabaseLoader.cpp" />
     <ClCompile Include="FileLoader.cpp" />
+    <ClCompile Include="StrArray.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="DatabaseLoaderImp.asm" />
+    <MASM Include="StrArrayImp.asm" />
   </ItemGroup>
 </Project>

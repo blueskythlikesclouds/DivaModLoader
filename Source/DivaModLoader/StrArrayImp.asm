@@ -42,7 +42,6 @@
 public ?implOfGetStr@@YAPEBDH@Z
 
 ?getModuleNameImp@@YAPEBDHH@Z proto
-GetModuleNameRetrunAddress proto
 
 ?implOfGetModuleName@@YAPEBDH@Z:
     push rbx
@@ -58,8 +57,9 @@ GetModuleNameRetrunAddress proto
     push r14
     push r15
 
-    mov edx, dword ptr [r8 + r15]
+    mov rdx, r14
     call ?getModuleNameImp@@YAPEBDHH@Z
+    mov r8, 0FFFFFFFFFFFFFFFFh
 
     pop r15
     pop r14
@@ -74,19 +74,17 @@ GetModuleNameRetrunAddress proto
     pop rdx
     pop rbx
 
-    jmp GetModuleNameRetrunAddress
+    ret
 
 public ?implOfGetModuleName@@YAPEBDH@Z
 
-?getCustomiseNameImp@@YAPEBDHH@Z proto
-GetCustomiseNameReturnAddress proto
+?getCustomizeNameImp@@YAPEBDHH@Z proto
 
-?implOfGetCustomiseNameReturn@@YAPEBDH@Z:
+?implOfGetCustomizeName@@YAPEBDH@Z:
     push rbx
     push rdx
     push rsi
     push rdi
-    push r8
     push r9
     push r10
     push r11
@@ -96,7 +94,8 @@ GetCustomiseNameReturnAddress proto
     push r15
 
     mov rdx, rbx
-    call ?getCustomiseNameImp@@YAPEBDHH@Z
+    call ?getCustomizeNameImp@@YAPEBDHH@Z
+    mov r8, 0FFFFFFFFFFFFFFFFh
 
     pop r15
     pop r14
@@ -105,14 +104,13 @@ GetCustomiseNameReturnAddress proto
     pop r11
     pop r10
     pop r9
-    pop r8
     pop rdi
     pop rsi
     pop rdx
     pop rbx
 
-    jmp GetCustomiseNameReturnAddress
+    ret
 
-public ?implOfGetCustomiseNameReturn@@YAPEBDH@Z
+public ?implOfGetCustomizeName@@YAPEBDH@Z
 
 end

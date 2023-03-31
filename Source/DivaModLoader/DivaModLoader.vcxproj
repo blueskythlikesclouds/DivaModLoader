@@ -110,6 +110,7 @@
     <ClInclude Include="Patches.h" />
     <ClInclude Include="Pch.h" />
     <ClInclude Include="SigScan.h" />
+    <ClInclude Include="StrArray.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
@@ -126,9 +127,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SigScan.cpp" />
+    <ClCompile Include="StrArray.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <MASM Include="DatabaseLoaderImp.asm">
+    <MASM Include="StrArrayImp.asm">
       <FileType>Document</FileType>
     </MASM>
   </ItemGroup>

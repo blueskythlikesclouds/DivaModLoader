@@ -65,14 +65,16 @@ const HMODULE MODULE_HANDLE = GetModuleHandle(nullptr);
 
 #define WRITE_JUMP(location, function) \
     do { \
-        WRITE_MEMORY(location, uint8_t, 0xE9); \
-        WRITE_MEMORY(location + 1, uint32_t, (uint32_t)((size_t)(function) - (size_t)(location) - 5)); \
+        WRITE_MEMORY((size_t)(location), uint8_t, 0x48, 0xB8); \
+        WRITE_MEMORY((size_t)(location) + 2, uint64_t, (uint64_t)(function)); \
+        WRITE_MEMORY((size_t)(location) + 10, uint8_t, 0xFF, 0xE0); \
     } while(0)
 	
 #define WRITE_CALL(location, function) \
     do { \
-        WRITE_MEMORY(location, uint8_t, 0xE8); \
-        WRITE_MEMORY(location + 1, uint32_t, (uint32_t)((size_t)(function) - (size_t)(location) - 5)); \
+        WRITE_MEMORY((size_t)(location), uint8_t, 0x48, 0xB8); \
+        WRITE_MEMORY((size_t)(location) + 2, uint64_t, (uint64_t)(function)); \
+        WRITE_MEMORY((size_t)(location) + 10, uint8_t, 0xFF, 0xD0); \
     } while(0)
 
 #define WRITE_NOP(location, count) \
