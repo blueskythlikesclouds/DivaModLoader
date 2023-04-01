@@ -10,6 +10,10 @@ typedef std::map<int, std::string> StrByIdMap;
 static StrByIdMap strMap;
 static StrByIdMap moduleStrMap;
 static StrByIdMap customizeStrMap;
+static StrByIdMap btnSeStrMap;
+static StrByIdMap slideSeStrMap;
+static StrByIdMap chainSlideSeStrMap;
+static StrByIdMap sliderTouchSeStrMap;
 
 static void readStrArray(const toml::table* table, StrByIdMap& dstStrMap)
 {
@@ -76,7 +80,11 @@ static void loadStrArray(const std::string& filePath)
 
     readStrArray(&table, langTable, strMap);
     readStrArray(&table, langTable, "module", moduleStrMap);
-    readStrArray(&table, langTable, "customize", customizeStrMap);
+    readStrArray(&table, langTable, "cstm_item", customizeStrMap);
+    readStrArray(&table, langTable, "btn_se", btnSeStrMap);
+    readStrArray(&table, langTable, "slide_se", slideSeStrMap);
+    readStrArray(&table, langTable, "chainslide_se", chainSlideSeStrMap);
+    readStrArray(&table, langTable, "slidertouch_se", sliderTouchSeStrMap);
 }
 
 HOOK(void, __fastcall, LoadStrArray, sigLoadStrArray())
@@ -91,6 +99,10 @@ HOOK(void, __fastcall, LoadStrArray, sigLoadStrArray())
 HOOK(const char*, __fastcall, GetStr, sigGetStr(), const int id);
 HOOK(const char*, __fastcall, GetModuleName, sigGetModuleName(), const int id);
 HOOK(const char*, __fastcall, GetCustomizeName, sigGetCustomizeName(), const int id);
+HOOK(const char*, __fastcall, GetBtnSeName, sigGetBtnSeName(), const int id);
+HOOK(const char*, __fastcall, GetSlideSeName, (uint8_t*)sigGetSlideSeName() + 0x4E0, const int id);
+HOOK(const char*, __fastcall, GetChainSlideSeName, sigGetChainSlideSeName(), const int id);
+HOOK(const char*, __fastcall, GetSliderTouchSeName, (uint8_t*)sigGetSliderTouchSeName() + 0x4E0, const int id);
 
 const char* getStrImp(const int id)
 {
@@ -122,10 +134,55 @@ const char* getCustomizeNameImp(const int id, const int customizeId)
     return getStrImp(id);
 }
 
+const char* getBtnSeNameImp(const int id, const int btnSeId)
+{
+    const auto str = btnSeStrMap.find(btnSeId);
+
+    if (str != btnSeStrMap.end())
+        return str->second.c_str();
+
+    return getStrImp(id);
+}
+
+const char* getSlideSeNameImp(const int id, const int slideSeId)
+{
+    const auto str = slideSeStrMap.find(slideSeId);
+
+    if (str != slideSeStrMap.end())
+        return str->second.c_str();
+
+    return getStrImp(id);
+}
+
+const char* getChainSlideSeNameImp(const int id, const int chainSlideSeId)
+{
+    const auto str = chainSlideSeStrMap.find(chainSlideSeId);
+
+    if (str != chainSlideSeStrMap.end())
+        return str->second.c_str();
+
+    return getStrImp(id);
+}
+
+const char* getSliderTouchSeNameImp(const int id, const int sliderTouchSeId)
+{
+    const auto str = sliderTouchSeStrMap.find(sliderTouchSeId);
+
+    if (str != sliderTouchSeStrMap.end())
+        return str->second.c_str();
+
+    return getStrImp(id);
+}
+
 void StrArray::init()
 {
     INSTALL_HOOK(LoadStrArray);
     INSTALL_HOOK(GetStr);
     WRITE_CALL(originalGetModuleName, implOfGetModuleName);
     WRITE_CALL(originalGetCustomizeName, implOfGetCustomizeName);
+    WRITE_CALL(originalGetBtnSeName, implOfGetBtnSeName);
+    WRITE_CALL(originalGetSlideSeName, implOfGetSlideSeName);
+    WRITE_CALL(originalGetChainSlideSeName, implOfGetChainSlideSeName);
+    WRITE_NOP((uint8_t*)originalGetChainSlideSeName + 0xC, 0x3);
+    WRITE_CALL(originalGetSliderTouchSeName, implOfGetSliderTouchSeName);
 }

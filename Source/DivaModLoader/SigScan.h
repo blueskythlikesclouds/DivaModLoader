@@ -30,3 +30,7 @@ extern void* sigLoadStrArray();
 extern void* sigGetStr();
 extern void* sigGetModuleName();
 extern void* sigGetCustomizeName();
+extern void* sigGetBtnSeName();
+extern void* sigGetSlideSeName();
+extern void* sigGetChainSlideSeName();
+extern void* sigGetSliderTouchSeName();
