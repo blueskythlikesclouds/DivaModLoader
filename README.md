@@ -127,6 +127,8 @@ All of the following string types are supported, and the same ID rule applies to
 * chainslide_se
 * slidertouch_se
 
+Please note that both formats can be used at the same time in the same file.
+
 ### DLL Loading
 
 DML allows you to inject your own code into the game by loading DLL files. Certain functions can be exposed in the DLLs for initialization and per frame updates.
