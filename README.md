@@ -98,6 +98,35 @@ An `id = "value"` pair declares a string for all languages. If you want to decla
 
 Please make sure all strings are wrapped in quotes.
 
+#### Grouped String Arrays
+
+When following the original string array file layout, a few limitations arise. For instance, since modules have their specific range starting from 275, adding too many module names outside the range could override customize item names. To solve this issue, DML provides a feature where you can specify strings in separate named arrays by their original ID, without worrying about accidentally overriding other strings.
+
+To demonstrate this format, the previous string array example can be redone as follows:
+
+```toml
+module.998 = "Mikudayo"
+cn.module.998 = "MIKUDAYO"
+kr.module.998 = "미쿠다요"
+tw.module.998 = "MIKUDAYO"
+module.999 = "Mikunano"
+cn.module.999 = "MIKUNANO"
+kr.module.999 = "미쿠나노"
+tw.module.999 = "MIKUNANO"
+```
+
+In this example, 998/999 numbers correspond to the module IDs, instead of the 1273/1274 in the previous example where the required offset number 275 was added to them. **Modders are advised to exclusively use this format.** 
+
+All of the following string types are supported, and the same ID rule applies to all of them:
+
+* module
+* customize
+* cstm_item
+* btn_se
+* slide_se
+* chainslide_se
+* slidertouch_se
+
 ### DLL Loading
 
 DML allows you to inject your own code into the game by loading DLL files. Certain functions can be exposed in the DLLs for initialization and per frame updates.
