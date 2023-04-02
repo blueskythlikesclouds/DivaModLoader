@@ -80,6 +80,7 @@ static void loadStrArray(const std::string& filePath)
 
     readStrArray(&table, langTable, strMap);
     readStrArray(&table, langTable, "module", moduleStrMap);
+    readStrArray(&table, langTable, "customize", customizeStrMap);
     readStrArray(&table, langTable, "cstm_item", customizeStrMap);
     readStrArray(&table, langTable, "btn_se", btnSeStrMap);
     readStrArray(&table, langTable, "slide_se", slideSeStrMap);
