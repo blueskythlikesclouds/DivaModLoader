@@ -13,6 +13,13 @@ You can use [DIVA Mod Manager (DMM)](https://github.com/TekkaGB/DivaModManager) 
     1. Right click the game on Steam.
     2. Select Properties -> Launch Options.
     3. Enter `WINEDLLOVERRIDES='dinput8.dll=n,b' %command%` as the command.
+* MacOS users (using Apple's Game Port Toolkit) additionaly need to do the following:
+    1. open winecfg of your game prefix you created (in terminal write gameportingtoolkit ~/change-to-your-prefix-name winecfg)  
+    2. Go to Libraries
+    3. Open the dropdown menu under "New override for library", choose from the list dinput8.dll and press Add
+    4. Make sure it says dinput8(native, builtin), if not press the Edit button and select Native and Builtin.
+    5. Close winecfg, start steam with your wine prefix and launch the game without any launch options
+    The game might crash at the start menu, just relaunch the game until it works
 
 ## Features
 
