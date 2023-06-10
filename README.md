@@ -13,6 +13,11 @@ You can use [DIVA Mod Manager (DMM)](https://github.com/TekkaGB/DivaModManager) 
     1. Right click the game on Steam.
     2. Select Properties -> Launch Options.
     3. Enter `WINEDLLOVERRIDES='dinput8.dll=n,b' %command%` as the command.
+* MacOS users (using Apple's Game Port Toolkit) additionaly need to do the following:
+    1. Open winecfg (in Terminal write `gameportingtoolkit ~/change-to-your-prefix-name winecfg`)  
+    2. Select Libraries
+    3. Open the dropdown menu -> select from the list `dinput8.dll` -> press Add
+    4. Make sure it says `dinput8(native, builtin)`. if not, press Edit and select `Native and Builtin`.
 
 ## Features
 
