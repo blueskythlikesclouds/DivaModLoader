@@ -6,6 +6,7 @@
 #include "ModLoader.h"
 #include "Patches.h"
 #include "SigScan.h"
+#include "SpriteLoader.h"
 #include "StrArray.h"
 
 #pragma comment(linker, "/EXPORT:DirectInput8Create=C:\\Windows\\System32\\dinput8.DirectInput8Create")
@@ -70,6 +71,8 @@ void Context::init()
     ModLoader::init();
     CodeLoader::init();
     FileLoader::init();
+    StrArray::init();
+    SpriteLoader::init();
 
     INSTALL_HOOK(WinMain);
 }
@@ -78,5 +81,4 @@ void Context::postInit()
 {
     CodeLoader::postInit();
     DatabaseLoader::init();
-    StrArray::init();
 }

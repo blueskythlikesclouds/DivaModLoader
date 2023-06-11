@@ -110,6 +110,7 @@
     <ClInclude Include="Patches.h" />
     <ClInclude Include="Pch.h" />
     <ClInclude Include="SigScan.h" />
+    <ClInclude Include="SpriteLoader.h" />
     <ClInclude Include="StrArray.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Utilities.h" />
@@ -127,6 +128,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SigScan.cpp" />
+    <ClCompile Include="SpriteLoader.cpp" />
     <ClCompile Include="StrArray.cpp" />
   </ItemGroup>
   <ItemGroup>

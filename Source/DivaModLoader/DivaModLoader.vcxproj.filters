@@ -14,6 +14,7 @@
     <ClInclude Include="DatabaseLoader.h" />
     <ClInclude Include="FileLoader.h" />
     <ClInclude Include="StrArray.h" />
+    <ClInclude Include="SpriteLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Pch.cpp" />
@@ -26,6 +27,7 @@
     <ClCompile Include="DatabaseLoader.cpp" />
     <ClCompile Include="FileLoader.cpp" />
     <ClCompile Include="StrArray.cpp" />
+    <ClCompile Include="SpriteLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="StrArrayImp.asm" />
