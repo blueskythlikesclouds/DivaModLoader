@@ -1,17 +1,19 @@
 ﻿#include "Patches.h"
 #include "SigScan.h"
 
+HOOK(bool, __fastcall, SteamAPI_RestartAppIfNecessary, PROC_ADDRESS("steam_api64.dll", "SteamAPI_RestartAppIfNecessary"), uint32_t appid)
+{
+    originalSteamAPI_RestartAppIfNecessary(appid);
+    std::ofstream ofs("steam_appid.txt");
+    ofs << appid;
+    ofs.close();
+    return false;
+}
+
 void Patches::init()
 {
     // Prevent SteamAPI_RestartAppIfNecessary.
-    WRITE_MEMORY((uint8_t*)sigInitSteamAPIManager() + 0x24, uint8_t, 0xEB);
-
-    // Create steam_appid.txt so the patch can actually function properly.
-    {
-        FILE* file = fopen("steam_appid.txt", "w");
-        fprintf(file, "%d", 1761390);
-        fclose(file);
-    }
+    INSTALL_HOOK(SteamAPI_RestartAppIfNecessary);
 
     // Enable loose folder support for 1.01.
     void* romCheckAddr1 = sigScan("\x48\x8B\x43\x10\x48\x89\xB4\x24\x00\x00\x00\x00\x48\x83\xF8\x04\x72\x41\x48\x8D\x34\x38\xBA\x00\x00\x00\x00\x4C\x8D\x46\xFD\x48\x8B\xCF\x4C\x2B\xC7\xE8\x00\x00\x00\x00\x48\x85\xC0\x74\x24", "xxxxxxxx????xxxxxxxxxxx????xxxxxxxxxxx????xxxxx", (void*)0x14016BFB6);
