@@ -22,7 +22,9 @@
     push r14
     push r15
 
+    sub rsp, 20h
     call ?getStrImp@@YAPEBDH@Z
+    add rsp, 20h
 
     pop r15
     pop r14
@@ -57,7 +59,9 @@ public ?implOfGetStr@@YAPEBDH@Z
     push r15
 
     mov rdx, r14
+    sub rsp, 20h
     call ?getModuleNameImp@@YAPEBDHH@Z
+    add rsp, 20h
     mov r8, 0FFFFFFFFFFFFFFFFh
 
     pop r15
@@ -92,7 +96,9 @@ public ?implOfGetModuleName@@YAPEBDH@Z
     push r15
 
     mov rdx, rbx
+    sub rsp, 20h
     call ?getCustomizeNameImp@@YAPEBDHH@Z
+    add rsp, 20h
     mov r8, 0FFFFFFFFFFFFFFFFh
 
     pop r15
@@ -128,7 +134,9 @@ public ?implOfGetCustomizeName@@YAPEBDH@Z
     push r15
 
     mov rdx, [r8+r15]
+    sub rsp, 20h
     call ?getBtnSeNameImp@@YAPEBDHH@Z
+    add rsp, 20h
 
     pop r15
     pop r14
@@ -167,7 +175,9 @@ public ?implOfGetBtnSeName@@YAPEBDH@Z
     push r15
 
     mov rdx, [r8+r15]
+    sub rsp, 20h
     call ?getSlideSeNameImp@@YAPEBDHH@Z
+    add rsp, 20h
 
     pop r15
     pop r14
@@ -206,7 +216,9 @@ public ?implOfGetSlideSeName@@YAPEBDH@Z
 
     imul rax, r14, 0A8h
     mov rdx, [rax+r8]
+    sub rsp, 20h
     call ?getChainSlideSeNameImp@@YAPEBDHH@Z
+    add rsp, 20h
 
     pop r15
     pop r14
@@ -244,7 +256,9 @@ public ?implOfGetChainSlideSeName@@YAPEBDH@Z
     push r15
 
     mov rdx, [r8+r15]
+    sub rsp, 20h
     call ?getSliderTouchSeNameImp@@YAPEBDHH@Z
+    add rsp, 20h
 
     pop r15
     pop r14
