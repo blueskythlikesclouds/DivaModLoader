@@ -14,4 +14,26 @@ namespace prj
 
     template<typename T>
     using list = std::list<T, Allocator<T>>;
+
+    template <class T>
+    struct default_delete
+    {
+        void operator()(T* ptr) const noexcept
+        {
+            operatorDelete(ptr);
+        }
+    };
+
+    template <class T>
+    struct default_delete<T[]>
+    {
+        void operator()(T* ptr) const noexcept
+        {
+            static_assert(std::is_trivially_destructible_v<T>); // Needs to be trivially destructible for now
+            operatorDelete(ptr);
+        }
+    };
+
+    template<typename T>
+    using unique_ptr = std::unique_ptr<T, default_delete<T>>;
 }

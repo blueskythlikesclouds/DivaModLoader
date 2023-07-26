@@ -1,5 +1,7 @@
 #include "SaveData.h"
 
+#include "Types.h"
+
 struct Score
 {
     int32_t pvId;
@@ -11,6 +13,7 @@ static std::unordered_map<uint32_t, Score> scoreMap;
 struct SaveDataEx
 {
     static constexpr uint32_t MAX_VERSION = 0;
+    static constexpr char FILE_NAME[] = "DivaModLoader.dat";
 
     uint32_t version;
     uint32_t headerSize;
@@ -26,37 +29,28 @@ struct SaveDataEx
     // ...add more functions in new versions as necessary
 };
 
-struct SaveDataExContainer
-{
-    uint32_t compressedSize;
-    uint32_t decompressedSize;
-};
+static FUNCTION_PTR(void, __fastcall, getSaveDataFilePath, 0x1401D70D0, prj::string& dstFilePath, const prj::string& fileName);
+static FUNCTION_PTR(void, __fastcall, getSaveDataKey, 0x1401D76F0, prj::string& dstKey, const prj::string& fileName, bool);
+
+static FUNCTION_PTR(bool, __fastcall, readSaveData, 0x1401D7C90,
+    const prj::string& fileName, prj::unique_ptr<uint8_t[]>& dst, size_t& dstSize);
+
+static FUNCTION_PTR(bool, __fastcall, writeSaveData, 0x1401D79D0,
+    const prj::string& key, const uint8_t* src, size_t srcSize, prj::unique_ptr<uint8_t[]>& dst, size_t& dstSize);
 
 HOOK(void, __fastcall, LoadSaveData, 0x1401D7FB0, void* A1)
 {
     originalLoadSaveData(A1);
 
-    FILE* file = fopen("DivaModLoader.dat", "rb");
-    if (file == nullptr)
+    prj::unique_ptr<uint8_t[]> data;
+    size_t dataSize = 0;
+
+    if (!readSaveData(SaveDataEx::FILE_NAME, data, dataSize) || dataSize < sizeof(SaveDataEx))
         return;
 
-    SaveDataExContainer container{};
-    fread(&container, sizeof(SaveDataExContainer), 1, file);
+    const auto saveData = reinterpret_cast<SaveDataEx*>(data.get());
 
-    const auto compressedData = std::make_unique<uint8_t[]>(container.compressedSize);
-
-    fread(compressedData.get(), sizeof(uint8_t), container.compressedSize, file);
-    fclose(file);
-
-    const auto decompressedData = std::make_unique<uint8_t[]>(container.decompressedSize);
-    uLongf decompressedSize = container.decompressedSize;
-
-    if (uncompress(decompressedData.get(), &decompressedSize, compressedData.get(), container.compressedSize) != Z_OK)
-        return;
-
-    const auto saveData = reinterpret_cast<SaveDataEx*>(decompressedData.get());
-
-    if (saveData->version > SaveDataEx::MAX_VERSION || saveData->headerSize > decompressedSize)
+    if (saveData->version > SaveDataEx::MAX_VERSION || saveData->headerSize > dataSize)
         return;
 
     for (uint32_t i = 0; i < saveData->scoreCount; i++)
@@ -69,6 +63,9 @@ HOOK(void, __fastcall, LoadSaveData, 0x1401D7FB0, void* A1)
 HOOK(void, __fastcall, SaveSaveData, 0x1401D8280, void* A1)
 {
     originalSaveSaveData(A1);
+
+    if (scoreMap.empty())
+        return;
 
     std::vector<uint8_t> data(sizeof(SaveDataEx));
 
@@ -84,23 +81,22 @@ HOOK(void, __fastcall, SaveSaveData, 0x1401D8280, void* A1)
         memcpy(&data[offset], &score, sizeof(Score));
     }
 
-    uLongf compressedSize = compressBound(static_cast<uint32_t>(data.size()));
-    const auto compressedData = std::make_unique<uint8_t[]>(compressedSize);
+    prj::string filePath;
+    prj::string key;
 
-    if (compress(compressedData.get(), &compressedSize, data.data(), static_cast<uLong>(data.size())) != Z_OK)
+    getSaveDataFilePath(filePath, SaveDataEx::FILE_NAME);
+    getSaveDataKey(key, SaveDataEx::FILE_NAME, true);
+
+    prj::unique_ptr<uint8_t[]> fileData;
+    size_t fileDataSize = 0;
+
+    if (!writeSaveData(key, data.data(), data.size(), fileData, fileDataSize))
         return;
 
-    FILE* file = fopen("DivaModLoader.dat", "wb");
+    FILE* file = fopen(filePath.c_str(), "wb");
     if (file != nullptr)
     {
-        const SaveDataExContainer container = 
-        {
-            compressedSize, // compressedSize
-            static_cast<uint32_t>(data.size()) // decompressedSize
-        };
-
-        fwrite(&container, sizeof(SaveDataExContainer), 1, file);
-        fwrite(compressedData.get(), sizeof(uint8_t), compressedSize, file);
+        fwrite(fileData.get(), sizeof(uint8_t), fileDataSize, file);
         fclose(file);
     }
 }
