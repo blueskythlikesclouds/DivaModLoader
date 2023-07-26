@@ -17,9 +17,14 @@
     push r13
     push r14
     push r15
+
+    mov r15, rsp
     sub rsp, 20h
+    and rsp, 0FFFFFFFFFFFFFFF0h
+
     call ?findOrCreateScoreImp@@YAPEAUScore@@PEAXH@Z
-    add rsp, 20h
+    mov rsp, r15
+
     pop r15
     pop r14
     pop r13
@@ -51,9 +56,14 @@ public ?implOfFindOrCreateScore@@YAPEAUScore@@PEAXI@Z
     push r13
     push r14
     push r15
+
+    mov r15, rsp
     sub rsp, 20h
+    and rsp, 0FFFFFFFFFFFFFFF0h
+
     call ?findScoreImp@@YAPEAUScore@@PEAXH@Z
-    add rsp, 20h
+    mov rsp, r15
+
     pop r15
     pop r14
     pop r13

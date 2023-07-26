@@ -6,6 +6,8 @@
 
 ; Push every register known to mankind to overcome this issue.
 
+; Additionally add 32 bytes of shadow space and align the stack pointer to 16 bytes to prevent further crashes.
+
 ?getStrImp@@YAPEBDH@Z proto
 
 ?implOfGetStr@@YAPEBDH@Z:
@@ -22,9 +24,12 @@
     push r14
     push r15
 
+    mov r15, rsp
     sub rsp, 20h
+    and rsp, 0FFFFFFFFFFFFFFF0h
+
     call ?getStrImp@@YAPEBDH@Z
-    add rsp, 20h
+    mov rsp, r15
 
     pop r15
     pop r14
@@ -58,11 +63,15 @@ public ?implOfGetStr@@YAPEBDH@Z
     push r14
     push r15
 
-    mov rdx, r14
+    mov r15, rsp
     sub rsp, 20h
+    and rsp, 0FFFFFFFFFFFFFFF0h
+
+    mov rdx, r14
     call ?getModuleNameImp@@YAPEBDHH@Z
-    add rsp, 20h
     mov r8, 0FFFFFFFFFFFFFFFFh
+
+    mov rsp, r15
 
     pop r15
     pop r14
@@ -95,11 +104,15 @@ public ?implOfGetModuleName@@YAPEBDH@Z
     push r14
     push r15
 
-    mov rdx, rbx
+    mov r15, rsp
     sub rsp, 20h
+    and rsp, 0FFFFFFFFFFFFFFF0h
+
+    mov rdx, rbx
     call ?getCustomizeNameImp@@YAPEBDHH@Z
-    add rsp, 20h
     mov r8, 0FFFFFFFFFFFFFFFFh
+
+    mov rsp, r15
 
     pop r15
     pop r14
@@ -133,10 +146,14 @@ public ?implOfGetCustomizeName@@YAPEBDH@Z
     push r14
     push r15
 
-    mov rdx, [r8+r15]
+    mov r15, rsp
     sub rsp, 20h
+    and rsp, 0FFFFFFFFFFFFFFF0h
+
+    mov rdx, [r8+r15]
     call ?getBtnSeNameImp@@YAPEBDHH@Z
-    add rsp, 20h
+
+    mov rsp, r15
 
     pop r15
     pop r14
@@ -174,10 +191,14 @@ public ?implOfGetBtnSeName@@YAPEBDH@Z
     push r14
     push r15
 
-    mov rdx, [r8+r15]
+    mov r15, rsp
     sub rsp, 20h
+    and rsp, 0FFFFFFFFFFFFFFF0h
+
+    mov rdx, [r8+r15]
     call ?getSlideSeNameImp@@YAPEBDHH@Z
-    add rsp, 20h
+    
+    mov rsp, r15
 
     pop r15
     pop r14
@@ -214,11 +235,15 @@ public ?implOfGetSlideSeName@@YAPEBDH@Z
     push r14
     push r15
 
+    mov r15, rsp
+    sub rsp, 20h
+    and rsp, 0FFFFFFFFFFFFFFF0h
+
     imul rax, r14, 0A8h
     mov rdx, [rax+r8]
-    sub rsp, 20h
     call ?getChainSlideSeNameImp@@YAPEBDHH@Z
-    add rsp, 20h
+
+    mov rsp, r15
 
     pop r15
     pop r14
@@ -255,10 +280,14 @@ public ?implOfGetChainSlideSeName@@YAPEBDH@Z
     push r14
     push r15
 
-    mov rdx, [r8+r15]
+    mov r15, rsp
     sub rsp, 20h
+    and rsp, 0FFFFFFFFFFFFFFF0h
+
+    mov rdx, [r8+r15]
     call ?getSliderTouchSeNameImp@@YAPEBDHH@Z
-    add rsp, 20h
+
+    mov rsp, r15
 
     pop r15
     pop r14
