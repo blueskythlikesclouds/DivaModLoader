@@ -5,6 +5,7 @@
 #include "FileLoader.h"
 #include "ModLoader.h"
 #include "Patches.h"
+#include "SaveData.h"
 #include "SigScan.h"
 #include "StrArray.h"
 
@@ -70,6 +71,7 @@ void Context::init()
     ModLoader::init();
     CodeLoader::init();
     FileLoader::init();
+    SaveData::init();
 
     INSTALL_HOOK(WinMain);
 }
