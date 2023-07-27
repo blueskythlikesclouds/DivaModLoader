@@ -146,14 +146,14 @@ public ?implOfGetCustomizeName@@YAPEBDH@Z
     push r14
     push r15
 
-    mov r15, rsp
+    mov r14, rsp
     sub rsp, 20h
     and rsp, 0FFFFFFFFFFFFFFF0h
 
     mov rdx, [r8+r15]
     call ?getBtnSeNameImp@@YAPEBDHH@Z
 
-    mov rsp, r15
+    mov rsp, r14
 
     pop r15
     pop r14
@@ -191,14 +191,14 @@ public ?implOfGetBtnSeName@@YAPEBDH@Z
     push r14
     push r15
 
-    mov r15, rsp
+    mov r14, rsp
     sub rsp, 20h
     and rsp, 0FFFFFFFFFFFFFFF0h
 
     mov rdx, [r8+r15]
     call ?getSlideSeNameImp@@YAPEBDHH@Z
     
-    mov rsp, r15
+    mov rsp, r14
 
     pop r15
     pop r14
@@ -280,14 +280,14 @@ public ?implOfGetChainSlideSeName@@YAPEBDH@Z
     push r14
     push r15
 
-    mov r15, rsp
+    mov r14, rsp
     sub rsp, 20h
     and rsp, 0FFFFFFFFFFFFFFF0h
 
     mov rdx, [r8+r15]
     call ?getSliderTouchSeNameImp@@YAPEBDHH@Z
 
-    mov rsp, r15
+    mov rsp, r14
 
     pop r15
     pop r14
