@@ -7,6 +7,8 @@
 //
 // This allows for 32K sprite sets to be loaded in the game.
 
+extern void spriteLoaderFixupInfoInSprite();
+
 void SpriteLoader::init()
 {
     WRITE_MEMORY(0x14028F553, uint32_t, 0x7FFF);
@@ -28,4 +30,7 @@ void SpriteLoader::init()
     WRITE_MEMORY(0x1405B7440, uint32_t, 0x80000000);
 
     WRITE_MEMORY(0x1405BCB2E, uint8_t, 31);
+
+    WRITE_CALL(0x1405BBF33, spriteLoaderFixupInfoInSprite);
+    WRITE_NOP(0x1405BBF33 + 0xC, 1);
 }

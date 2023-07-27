@@ -136,6 +136,7 @@
   </ItemGroup>
   <ItemGroup>
     <MASM Include="SaveDataImp.asm" />
+    <MASM Include="SpriteLoaderImp.asm" />
     <MASM Include="StrArrayImp.asm">
       <FileType>Document</FileType>
     </MASM>
