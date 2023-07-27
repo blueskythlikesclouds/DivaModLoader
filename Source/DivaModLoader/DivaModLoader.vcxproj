@@ -111,6 +111,7 @@
     <ClInclude Include="Pch.h" />
     <ClInclude Include="SaveData.h" />
     <ClInclude Include="SigScan.h" />
+    <ClInclude Include="SpriteLoader.h" />
     <ClInclude Include="StrArray.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Utilities.h" />
@@ -130,6 +131,7 @@
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="ScoreData.cpp" />
     <ClCompile Include="SigScan.cpp" />
+    <ClCompile Include="SpriteLoader.cpp" />
     <ClCompile Include="StrArray.cpp" />
   </ItemGroup>
   <ItemGroup>

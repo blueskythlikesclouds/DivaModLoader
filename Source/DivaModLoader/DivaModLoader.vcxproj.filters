@@ -14,6 +14,7 @@
     <ClInclude Include="DatabaseLoader.h" />
     <ClInclude Include="FileLoader.h" />
     <ClInclude Include="StrArray.h" />
+    <ClInclude Include="SpriteLoader.h" />
     <ClInclude Include="SaveData.h" />
   </ItemGroup>
   <ItemGroup>
@@ -27,6 +28,7 @@
     <ClCompile Include="DatabaseLoader.cpp" />
     <ClCompile Include="FileLoader.cpp" />
     <ClCompile Include="StrArray.cpp" />
+    <ClCompile Include="SpriteLoader.cpp" />
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="ScoreData.cpp" />
   </ItemGroup>
