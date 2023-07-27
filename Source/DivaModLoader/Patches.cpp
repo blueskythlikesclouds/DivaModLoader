@@ -19,4 +19,12 @@ void Patches::init()
 
     if (romCheckAddr1) WRITE_MEMORY((char*)romCheckAddr1 + 0x10, uint8_t, 0xEB);
     if (romCheckAddr2) WRITE_MEMORY((char*)romCheckAddr2 + 0x12, uint8_t, 0xEB);
+
+    // Remove module ID limit of 1035.
+    WRITE_MEMORY(0x14E7DCDBD, uint8_t, 0x89, 0xD0, 0xC3);
+    WRITE_NOP(0x14E81086B, 4);
+
+    // Remove COS limit of 498.
+    WRITE_MEMORY(0x14067F443, uint8_t, 0xEB);
+    WRITE_NOP(0x1587FCBA4, 4);
 }
