@@ -12,6 +12,7 @@
 
 ?implOfGetStr@@YAPEBDH@Z:
     push rbx
+    push rcx
     push rdx
     push rsi
     push rdi
@@ -42,6 +43,7 @@
     pop rdi
     pop rsi
     pop rdx
+    pop rcx
     pop rbx
 
     ret
@@ -52,6 +54,7 @@ public ?implOfGetStr@@YAPEBDH@Z
 
 ?implOfGetModuleName@@YAPEBDH@Z:
     push rbx
+    push rcx
     push rdx
     push rsi
     push rdi
@@ -83,6 +86,7 @@ public ?implOfGetStr@@YAPEBDH@Z
     pop rdi
     pop rsi
     pop rdx
+    pop rcx
     pop rbx
 
     ret
@@ -93,6 +97,7 @@ public ?implOfGetModuleName@@YAPEBDH@Z
 
 ?implOfGetCustomizeName@@YAPEBDH@Z:
     push rbx
+    push rcx
     push rdx
     push rsi
     push rdi
@@ -124,6 +129,7 @@ public ?implOfGetModuleName@@YAPEBDH@Z
     pop rdi
     pop rsi
     pop rdx
+    pop rcx
     pop rbx
 
     ret
