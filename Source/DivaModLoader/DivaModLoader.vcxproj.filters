@@ -24,16 +24,17 @@
     <ClCompile Include="CodeLoader.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Patches.cpp" />
-    <ClCompile Include="SigScan.cpp" />
     <ClCompile Include="DatabaseLoader.cpp" />
     <ClCompile Include="FileLoader.cpp" />
     <ClCompile Include="StrArray.cpp" />
     <ClCompile Include="SpriteLoader.cpp" />
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="ScoreData.cpp" />
+    <ClCompile Include="Allocator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="StrArrayImp.asm" />
     <MASM Include="SaveDataImp.asm" />
+    <MASM Include="SpriteLoaderImp.asm" />
   </ItemGroup>
 </Project>

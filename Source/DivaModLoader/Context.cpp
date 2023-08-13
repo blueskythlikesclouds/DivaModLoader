@@ -9,6 +9,7 @@
 #include "SigScan.h"
 #include "SpriteLoader.h"
 #include "StrArray.h"
+#include "Utilities.h"
 
 #pragma comment(linker, "/EXPORT:DirectInput8Create=C:\\Windows\\System32\\dinput8.DirectInput8Create")
 
@@ -30,6 +31,14 @@ BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
     return TRUE;
 }
 
+SIG_SCAN
+(
+    sigCrtMain,
+    0x140978288,
+    "\x48\x89\x5C\x24\x08\x57\x48\x83\xEC\x30\xB9", 
+    "xxxxxxxxxxx"
+);
+
 HOOK(int, WINAPI, CrtMain, sigCrtMain(), HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     Context::init();
@@ -37,7 +46,15 @@ HOOK(int, WINAPI, CrtMain, sigCrtMain(), HINSTANCE hInstance, HINSTANCE hPrevIns
     return originalCrtMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd);
 }
 
-HOOK(int, WINAPI, WinMain, sigWinMain(), HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+SIG_SCAN
+(
+    sigWinMain,
+    0x140978389,
+    "\xE8\xCC\xCC\xCC\xCC\x8B\xD8\xE8\xCC\xCC\xCC\xCC\x84\xC0\x74\x50", 
+    "x????xxx????xxxx"
+); // call to function, E8 ?? ?? ?? ??
+
+HOOK(int, WINAPI, WinMain, readInstrPtr(sigWinMain(), 0, 0x5), HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     Context::postInit();
 

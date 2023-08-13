@@ -117,6 +117,7 @@
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Allocator.cpp" />
     <ClCompile Include="CodeLoader.cpp" />
     <ClCompile Include="Config.cpp" />
     <ClCompile Include="Context.cpp" />
@@ -130,7 +131,6 @@
     </ClCompile>
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="ScoreData.cpp" />
-    <ClCompile Include="SigScan.cpp" />
     <ClCompile Include="SpriteLoader.cpp" />
     <ClCompile Include="StrArray.cpp" />
   </ItemGroup>

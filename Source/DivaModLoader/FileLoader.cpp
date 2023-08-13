@@ -1,5 +1,7 @@
 ﻿#include "FileLoader.h"
+
 #include "Allocator.h"
+#include "SigScan.h"
 
 // This piece of code here only applies to 1.01. For some reason, not all TXT files can be loaded
 // outside CPKs in this version, so we need to do it manually.
@@ -11,6 +13,14 @@ struct CpkFileHandle
     size_t dataSize; // 0x108
     uint8_t gap110[0x18];
 };
+
+SIG_SCAN
+(
+    sigLoadFileFromCpk,
+    0x1401717C0,
+    "\x48\x89\x5C\x24\x10\x48\x89\x74\x24\x18\x48\x89\x7C\x24\x20\x55\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\x6C\x24\xC9\x48\x81\xEC\xE0\x00\x00\x00\x48\x8B\x05\xCC\xCC\xCC\xCC\x48\x33\xC4\x48\x89\x45\x27\x45", 
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxx"
+);
 
 HOOK(CpkFileHandle*, __fastcall, OpenFileFromCpk, sigLoadFileFromCpk(), const char* fileName, bool a2, bool a3)
 {

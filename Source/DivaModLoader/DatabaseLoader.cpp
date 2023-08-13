@@ -1,7 +1,7 @@
 ﻿#include "DatabaseLoader.h"
 
-#include "Context.h"
 #include "ModLoader.h"
+#include "SigScan.h"
 #include "Types.h"
 #include "Utilities.h"
 
@@ -35,7 +35,15 @@ void resolveModFilePath(prj::string& filePath)
     filePath += right;
 }
 
-HOOK(size_t, __fastcall, ResolveFilePath, sigResolveFilePath(), prj::string& filePath, prj::string* a2)
+SIG_SCAN
+(
+    sigResolveFilePath,
+    0x14026745B,
+    "\xE8\xCC\xCC\xCC\xCC\x4C\x8B\x65\xF0", 
+    "x????xxxx"
+); // call to function, E8 ?? ?? ?? ??
+
+HOOK(size_t, __fastcall, ResolveFilePath, readInstrPtr(sigResolveFilePath(), 0, 0x5), prj::string& filePath, prj::string* a2)
 {
     resolveModFilePath(filePath);
 
@@ -46,6 +54,14 @@ HOOK(size_t, __fastcall, ResolveFilePath, sigResolveFilePath(), prj::string& fil
     return originalResolveFilePath(filePath, a2);
 }
 
+SIG_SCAN
+(
+    sigInitMdataMgr,
+    0x14043E050,
+    "\x48\x89\x5C\x24\x08\x48\x89\x6C\x24\x10\x48\x89\x74\x24\x18\x48\x89\x7C\x24\x20\x41\x54\x41\x56\x41\x57\x48\x83\xEC\x60\x48\x8B\x44", 
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+);
+
 void DatabaseLoader::init()
 {
     INSTALL_HOOK(ResolveFilePath);
@@ -54,8 +70,7 @@ void DatabaseLoader::init()
     // initializer function which gets called before WinMain.
 
     // Get the list address from the lea instruction that loads it.
-    uint8_t* instrAddr = (uint8_t*)sigInitMdataMgr() + 0xFE;
-    auto& list = *(prj::list<prj::string>*)(instrAddr + readUnalignedU32(instrAddr + 0x3) + 0x7);
+    auto& list = *(prj::list<prj::string>*)readInstrPtr(sigInitMdataMgr(), 0xFE, 0x7);
 
     // Traverse mod folders in reverse to have correct priority.
     for (auto it = ModLoader::modDirectoryPaths.rbegin(); it != ModLoader::modDirectoryPaths.rend(); ++it)

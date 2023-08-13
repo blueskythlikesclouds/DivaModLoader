@@ -1,8 +1,12 @@
 ﻿#pragma once
 
-#include "SigScan.h"
+#include "Utilities.h"
 
-static inline FUNCTION_PTR(void*, __fastcall, operatorNew, sigOperatorNew(), size_t);
+extern void* sigOperatorNew();
+extern void* sigOperatorDelete();
+extern void* sigHeapCMallocAllocate();
+
+static inline FUNCTION_PTR(void*, __fastcall, operatorNew, readInstrPtr(sigOperatorNew(), 0, 0x5), size_t);
 static inline FUNCTION_PTR(void*, __fastcall, operatorDelete, sigOperatorDelete(), void*);
 static inline FUNCTION_PTR(void*, __fastcall, heapCMallocAllocate, sigHeapCMallocAllocate(), size_t type, size_t size, const char* name);
 

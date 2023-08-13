@@ -2,16 +2,24 @@
 
 #include "CodeLoader.h"
 #include "Context.h"
+#include "SigScan.h"
 #include "Types.h"
 #include "Utilities.h"
+
+SIG_SCAN
+(
+    sigInitRomDirectoryPaths,
+    0x1402A23E0,
+    "\x48\x89\x5C\x24\x08\x48\x89\x74\x24\x10\x48\x89\x7C\x24\x18\x55\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8B\xEC\x48\x81\xEC\x80\x00\x00\x00\x48\x8B\x05\xCC\xCC\xCC\xCC\x48\x33\xC4\x48\x89\x45\xF0\x48", 
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxx"
+);
 
 HOOK(void, __fastcall, InitRomDirectoryPaths, sigInitRomDirectoryPaths())
 {
     originalInitRomDirectoryPaths();
 
     // Get the address of the vector from the lea instruction that loads it.
-    uint8_t* instrAddr = (uint8_t*)sigInitRomDirectoryPaths() + 0x30;
-    const auto romDirectoryPaths = (prj::vector<prj::string>*)(instrAddr + readUnalignedU32(instrAddr + 0x3) + 0x7);
+    const auto romDirectoryPaths = (prj::vector<prj::string>*)(readInstrPtr(sigInitRomDirectoryPaths(), 0x30, 0x7));
 
     std::vector<std::string> modRomDirectoryPaths;
 
