@@ -1,6 +1,7 @@
 ﻿#include "CodeLoader.h"
 
 #include "Context.h"
+#include "SigScan.h"
 #include "Utilities.h"
 
 // Stores the current directory, and reverts it back to the original when it exits the current scope.
@@ -55,7 +56,15 @@ VTABLE_HOOK(HRESULT, WINAPI, IDXGISwapChain, ResizeBuffers, UINT BufferCount, UI
     return res;
 }
 
-HOOK(HRESULT, WINAPI, D3D11CreateDeviceAndSwapChain, PROC_ADDRESS("d3d11.dll", "D3D11CreateDeviceAndSwapChain"),
+SIG_SCAN
+(
+    sigD3D11CreateDeviceAndSwapChain,
+    0x1402C0C89,
+    "\xFF\x15\xCC\xCC\xCC\xCC\x41\xC6\x87\xAC\x00\x00\x00\x00", 
+    "xx????xxxxxxxx"
+); // function call, FF 15 ?? ?? ?? ??
+
+HOOK(HRESULT, WINAPI, D3D11CreateDeviceAndSwapChain, /* address set in init due to denuvo shenanigans */ nullptr,
     IDXGIAdapter* pAdapter,
     D3D_DRIVER_TYPE DriverType,
     HMODULE Software,
@@ -87,7 +96,7 @@ HOOK(HRESULT, WINAPI, D3D11CreateDeviceAndSwapChain, PROC_ADDRESS("d3d11.dll", "
         return result;
 
     if (!CodeLoader::d3dInitEvents.empty() && ppSwapChain && *ppSwapChain && 
-        ppDevice && *ppDevice && *ppImmediateContext && ppImmediateContext)
+        ppDevice && *ppDevice && ppImmediateContext && *ppImmediateContext)
     {
         CurrentDirectoryGuard guard;
 
@@ -193,7 +202,13 @@ void CodeLoader::init()
     }
 
     if (!d3dInitEvents.empty() || !onFrameEvents.empty() || !onResizeEvents.empty())
+    {
+        // load import address manually for RenderDoc compatibility
+        originalD3D11CreateDeviceAndSwapChain =
+            *(D3D11CreateDeviceAndSwapChainDelegate**)readInstrPtr(sigD3D11CreateDeviceAndSwapChain(), 0, 0x6);
+
         INSTALL_HOOK(D3D11CreateDeviceAndSwapChain);
+    }
 }
 
 // Gets called during WinMain.

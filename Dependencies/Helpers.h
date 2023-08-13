@@ -25,8 +25,8 @@ const HMODULE MODULE_HANDLE = GetModuleHandle(nullptr);
     GetProcAddress(LoadLibrary(TEXT(libraryName)), procName)
 
 #define HOOK(returnType, callingConvention, functionName, location, ...) \
-    typedef returnType callingConvention _##functionName(__VA_ARGS__); \
-    _##functionName* original##functionName = (_##functionName*)(location); \
+    typedef returnType callingConvention functionName##Delegate(__VA_ARGS__); \
+    functionName##Delegate* original##functionName = (functionName##Delegate*)(location); \
     returnType callingConvention implOf##functionName(__VA_ARGS__)
 
 #define INSTALL_HOOK(functionName) \
