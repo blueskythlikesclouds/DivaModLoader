@@ -1,6 +1,7 @@
 #include "SaveData.h"
 
 #include "Types.h"
+#include "SigScan.h"
 
 struct Score
 {
@@ -48,16 +49,56 @@ struct SaveDataEx
     // ...add more functions in new versions as necessary
 };
 
-static FUNCTION_PTR(void, __fastcall, getSaveDataFilePath, 0x1401D70D0, prj::string& dstFilePath, const prj::string& fileName);
-static FUNCTION_PTR(void, __fastcall, getSaveDataKey, 0x1401D76F0, prj::string& dstKey, const prj::string& fileName, bool);
+SIG_SCAN
+(
+    sigGetSaveDataFilePath,
+    0x1401D70D0,
+    "\x48\x8B\xC4\x48\x89\x58\x18\x55\x56\x57\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\xA8\xE8\xFB\xFF\xFF\x48\x81\xEC\xE0\x04\x00\x00\x0F\x29\x70\xB8\x0F\x29\x78\xA8\x48", 
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+);
 
-static FUNCTION_PTR(bool, __fastcall, readSaveData, 0x1401D7C90,
+SIG_SCAN
+(
+    sigGetSaveDataKey,
+    0x1401D76F0,
+    "\x48\x89\x5C\x24\x18\x48\x89\x74\x24\x20\x55\x57\x41\x54\x41\x56\x41\x57\x48\x8B\xEC\x48\x83\xEC\x60", 
+    "xxxxxxxxxxxxxxxxxxxxxxxxx"
+);
+
+static FUNCTION_PTR(void, __fastcall, getSaveDataFilePath, sigGetSaveDataFilePath(), prj::string& dstFilePath, const prj::string& fileName);
+static FUNCTION_PTR(void, __fastcall, getSaveDataKey, sigGetSaveDataKey(), prj::string& dstKey, const prj::string& fileName, bool);
+
+SIG_SCAN
+(
+    sigReadSaveData,
+    0x1401D7C90,
+    "\x48\x89\x5C\x24\x20\x55\x56\x57\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\x6C\x24\xD9\x48\x81\xEC\xE0\x00\x00\x00\x48\x8B\x05\xCC\xCC\xCC\xCC\x48\x33\xC4\x48\x89\x45\x17\x4D", 
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx????xxxxxxxx"
+);
+
+SIG_SCAN
+(
+    sigWriteSaveData,
+    0x1401D79D0,
+    "\x40\x53\x55\x56\x57\x41\x54\x41\x57\x48\x83\xEC\x78",
+    "xxxxxxxxxxxxx"
+);
+
+static FUNCTION_PTR(bool, __fastcall, readSaveData, sigReadSaveData(),
     const prj::string& fileName, prj::unique_ptr<uint8_t[]>& dst, size_t& dstSize);
 
-static FUNCTION_PTR(bool, __fastcall, writeSaveData, 0x1401D79D0,
+static FUNCTION_PTR(bool, __fastcall, writeSaveData, sigWriteSaveData(),
     const prj::string& key, const uint8_t* src, size_t srcSize, prj::unique_ptr<uint8_t[]>& dst, size_t& dstSize);
 
-HOOK(void, __fastcall, LoadSaveData, 0x1401D7FB0, void* A1)
+SIG_SCAN
+(
+    sigLoadSaveData,
+    0x1401D7FB0,
+    "\x48\x85\xC9\x0F\x84\x75\x01",
+    "xxxxxxx"
+);
+
+HOOK(void, __fastcall, LoadSaveData, sigLoadSaveData(), void* A1)
 {
     originalLoadSaveData(A1);
 
@@ -78,8 +119,6 @@ HOOK(void, __fastcall, LoadSaveData, 0x1401D7FB0, void* A1)
         scoreMap.insert(std::make_pair(score.pvId, score));
     }
 
-    // TODO: get rid of the versioning before releasing DML 0.0.11
-    // having it here just for dev (and to give an idea of how it'd function in the future)
     if (saveData->version >= 1)
     {
         for (uint32_t i = 0; i < saveData->moduleCount; i++)
@@ -90,7 +129,15 @@ HOOK(void, __fastcall, LoadSaveData, 0x1401D7FB0, void* A1)
     }
 }
 
-HOOK(void, __fastcall, SaveSaveData, 0x1401D8280, void* A1)
+SIG_SCAN
+(
+    sigSaveSaveData,
+    0x1401D8280,
+    "\x48\x85\xC9\x0F\x84\xDE", 
+    "xxxxxx"
+);
+
+HOOK(void, __fastcall, SaveSaveData, sigSaveSaveData(), void* A1)
 {
     originalSaveSaveData(A1);
 
@@ -145,10 +192,34 @@ HOOK(void, __fastcall, SaveSaveData, 0x1401D8280, void* A1)
     }
 }
 
+SIG_SCAN
+(
+    sigFindOrCreateScore,
+    0x14E589750,
+    "\x48\x83\xEC\x28\x49\x89\xCA\x85", 
+    "xxxxxxxx"
+);
+
+SIG_SCAN
+(
+    sigFindScore,
+    0x14E5A32F0,
+    "\x85\xD2\x0F\x88\x7E", 
+    "xxxxx"
+);
+
+SIG_SCAN
+(
+    sigFindModule,
+    0x1401D5C90,
+    "\x81\xFA\xFF\x03\x00\x00\x77",
+    "xxxxxxx"
+);
+
 // See SaveDataImp.asm for implementations.
-HOOK(Score*, __fastcall, FindOrCreateScore, 0x14E589750, void* A1, uint32_t pvId);
-HOOK(Score*, __fastcall, FindScore, 0x14E5A32F0, void* A1, uint32_t pvId);
-HOOK(Module*, __fastcall, FindModule, 0x1401D5C90, void* A1, uint32_t moduleId);
+HOOK(Score*, __fastcall, FindOrCreateScore, sigFindOrCreateScore(), void* A1, uint32_t pvId);
+HOOK(Score*, __fastcall, FindScore, sigFindScore(), void* A1, uint32_t pvId);
+HOOK(Module*, __fastcall, FindModule, sigFindModule(), void* A1, uint32_t moduleId);
 
 extern uint8_t EMPTY_SCORE_DATA[];
 

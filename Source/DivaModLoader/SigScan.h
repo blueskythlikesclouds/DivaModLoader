@@ -49,6 +49,7 @@ FORCEINLINE void* sigScan(const char* signature, const char* mask, void* hint)
     if ((hint >= info.lpBaseOfDll) && ((char*)hint + sigSize <= (char*)info.lpBaseOfDll + info.SizeOfImage))
     {
         void* result = sigScan(signature, mask, sigSize, hint, sigSize);
+        assert(result);
 
         if (result)
             return result;
