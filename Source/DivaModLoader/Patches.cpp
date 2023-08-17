@@ -74,4 +74,11 @@ void Patches::init()
     // Remove COS limit of 498.
     WRITE_MEMORY(sigCosLimit1(), uint8_t, 0xEB);
     WRITE_NOP(sigCosLimit2(), 4);
+
+    // Remove texture ID limit of 1048575.
+    // FIXME: This breaks module texture replacements!
+    //WRITE_NOP(0x140461021, 6);
+    //WRITE_NOP(0x140461435, 6);
+    //WRITE_NOP(0x140462608, 6);
+    //WRITE_NOP(0x140462C66, 6);
 }
