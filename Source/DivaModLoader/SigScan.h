@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <cassert>
 #include <Psapi.h>
 
 FORCEINLINE const MODULEINFO& getModuleInfo()

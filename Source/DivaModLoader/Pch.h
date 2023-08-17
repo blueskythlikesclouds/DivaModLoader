@@ -5,8 +5,6 @@
 #undef _ITERATOR_DEBUG_LEVEL
 #define _ITERATOR_DEBUG_LEVEL 0
 
-#define WIN32_LEAN_AND_MEAN
-
 #include <Windows.h>
 #include <detours.h>
 
