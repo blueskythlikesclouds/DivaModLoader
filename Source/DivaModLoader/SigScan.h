@@ -3,7 +3,7 @@
 #include <cassert>
 #include <Psapi.h>
 
-FORCEINLINE const MODULEINFO& getModuleInfo()
+inline const MODULEINFO& getModuleInfo()
 {
     static MODULEINFO moduleInfo;
 
@@ -17,7 +17,7 @@ FORCEINLINE const MODULEINFO& getModuleInfo()
 }
 
 // Signature scan in specified memory region
-FORCEINLINE void* sigScan(const char* signature, const char* mask, size_t sigSize, void* memory, const size_t memorySize)
+inline void* sigScan(const char* signature, const char* mask, size_t sigSize, void* memory, const size_t memorySize)
 {
     if (sigSize == 0)
         sigSize = strlen(mask);
@@ -41,7 +41,7 @@ FORCEINLINE void* sigScan(const char* signature, const char* mask, size_t sigSiz
 }
 
 // Signature scan in current process
-FORCEINLINE void* sigScan(const char* signature, const char* mask, void* hint)
+inline void* sigScan(const char* signature, const char* mask, void* hint)
 {
     const MODULEINFO& info = getModuleInfo();
     const size_t sigSize = strlen(mask);
@@ -65,9 +65,9 @@ inline bool sigValid = true;
 
 // Automatically scanned signature
 #define SIG_SCAN(x, y, ...) \
-    FORCEINLINE void* x(); \
+    inline void* x(); \
     inline void* x##Addr = x(); \
-    FORCEINLINE void* x() \
+    inline void* x() \
     { \
         constexpr const char* x##Data[] = { __VA_ARGS__ }; \
         constexpr size_t x##Size = _countof(x##Data); \
