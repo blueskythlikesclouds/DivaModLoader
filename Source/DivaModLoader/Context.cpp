@@ -13,15 +13,9 @@
 
 #pragma comment(linker, "/EXPORT:DirectInput8Create=C:\\Windows\\System32\\dinput8.DirectInput8Create")
 
-// DllMain:
-// - Do the least amount of work possible. We don't want to run into loader locks.
-
-// CRT: 
-// - Load mods before MM+'s CRT initializer. This lets DLL mods hook into C/C++ initializers using PreInit function.
-
-// WinMain:
-// - Call Init and PostInit functions of DLL mods.
-// - Install database loader as we insert into a dynamically initialized std::list.
+// DllMain: Do the least amount of work possible. We don't want to run into loader locks.
+// CRT: Load mods before MM+'s CRT initializer. This lets DLL mods hook into C/C++ initializers using PreInit function.
+// WinMain: Call Init and PostInit functions of DLL mods.
 
 BOOL WINAPI DllMain(HINSTANCE instance, DWORD reason, LPVOID reserved)
 {
@@ -92,6 +86,7 @@ void Context::init()
     SaveData::init();
     StrArray::init();
     SpriteLoader::init();
+    DatabaseLoader::init();
 
     INSTALL_HOOK(WinMain);
 }
@@ -99,5 +94,4 @@ void Context::init()
 void Context::postInit()
 {
     CodeLoader::postInit();
-    DatabaseLoader::init();
 }
