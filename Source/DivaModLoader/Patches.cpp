@@ -58,6 +58,14 @@ SIG_SCAN
     "xxxxxxxx"
 );
 
+SIG_SCAN
+(
+    sigPvDbDateCheck,
+    0x1404B152D,
+    "\x0F\x8D\xD1\x6E\x00\x00", 
+    "xxxxxx"
+);
+
 void Patches::init()
 {
     // Prevent SteamAPI_RestartAppIfNecessary.
@@ -75,10 +83,6 @@ void Patches::init()
     WRITE_MEMORY(sigCosLimit1(), uint8_t, 0xEB);
     WRITE_NOP(sigCosLimit2(), 4);
 
-    // Remove texture ID limit of 1048575.
-    // FIXME: This breaks module texture replacements!
-    //WRITE_NOP(0x140461021, 6);
-    //WRITE_NOP(0x140461435, 6);
-    //WRITE_NOP(0x140462608, 6);
-    //WRITE_NOP(0x140462C66, 6);
+    // Remove PV DB date check.
+    WRITE_NOP(sigPvDbDateCheck(), 6);
 }
