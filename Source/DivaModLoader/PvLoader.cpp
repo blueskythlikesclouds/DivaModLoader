@@ -73,6 +73,13 @@ void PvLoader::init()
     WRITE_MEMORY(0x140580860, uint8_t, 0x90, 0x90, 0x90, 0xEB);
     WRITE_MEMORY(0x140580883, uint8_t, 0x90, 0x90, 0x90, 0xEB);
 
+    // Prevent truncation to u16 when using MM+ UI, there's enough space for an u32 since the next element is 4 byte aligned
+    WRITE_NOP(0x1406DE563, 1);
+    WRITE_NOP(0x1406DEA21, 1);
+    WRITE_NOP(0x1406DEA28, 3);
+    WRITE_MEMORY(0x1406DF6F4, uint8_t, 0x90, 0x8B);
+    WRITE_NOP(0x1406DF748, 1);
+
     // Scan the pv_db file before reading it to not waste time looking for entries that don't exist in the file
     WRITE_CALL(originalPvLoaderParseStart, implOfPvLoaderParseStart);
     WRITE_NOP(reinterpret_cast<uint8_t*>(originalPvLoaderParseStart) + 0xC, 0x3);
