@@ -16,6 +16,7 @@
     <ClInclude Include="StrArray.h" />
     <ClInclude Include="SpriteLoader.h" />
     <ClInclude Include="SaveData.h" />
+    <ClInclude Include="PvLoader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Pch.cpp" />
@@ -31,10 +32,12 @@
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="ScoreData.cpp" />
     <ClCompile Include="Allocator.cpp" />
+    <ClCompile Include="PvLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="StrArrayImp.asm" />
     <MASM Include="SaveDataImp.asm" />
     <MASM Include="SpriteLoaderImp.asm" />
+    <MASM Include="PvLoaderImp.asm" />
   </ItemGroup>
 </Project>

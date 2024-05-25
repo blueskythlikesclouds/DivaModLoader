@@ -5,7 +5,7 @@
 #include "SigScan.h"
 #include "Utilities.h"
 
-typedef std::map<int, std::string> StrByIdMap;
+typedef std::unordered_map<int, std::string> StrByIdMap;
 
 static StrByIdMap strMap;
 static StrByIdMap moduleStrMap;

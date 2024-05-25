@@ -111,6 +111,7 @@
     <ClInclude Include="Pch.h" />
     <ClInclude Include="SaveData.h" />
     <ClInclude Include="SigScan.h" />
+    <ClInclude Include="PvLoader.h" />
     <ClInclude Include="SpriteLoader.h" />
     <ClInclude Include="StrArray.h" />
     <ClInclude Include="Types.h" />
@@ -131,11 +132,13 @@
     </ClCompile>
     <ClCompile Include="SaveData.cpp" />
     <ClCompile Include="ScoreData.cpp" />
+    <ClCompile Include="PvLoader.cpp" />
     <ClCompile Include="SpriteLoader.cpp" />
     <ClCompile Include="StrArray.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="SaveDataImp.asm" />
+    <MASM Include="PvLoaderImp.asm" />
     <MASM Include="SpriteLoaderImp.asm" />
     <MASM Include="StrArrayImp.asm">
       <FileType>Document</FileType>

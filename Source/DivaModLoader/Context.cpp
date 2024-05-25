@@ -10,6 +10,7 @@
 #include "SpriteLoader.h"
 #include "StrArray.h"
 #include "Utilities.h"
+#include "PvLoader.h"
 
 #pragma comment(linker, "/EXPORT:DirectInput8Create=C:\\Windows\\System32\\dinput8.DirectInput8Create")
 
@@ -87,6 +88,7 @@ void Context::init()
     StrArray::init();
     SpriteLoader::init();
     DatabaseLoader::init();
+    PvLoader::init();
 
     INSTALL_HOOK(WinMain);
 }
