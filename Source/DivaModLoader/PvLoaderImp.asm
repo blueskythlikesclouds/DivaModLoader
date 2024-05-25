@@ -36,7 +36,7 @@ endm
 
 ?implOfSpriteLoaderGetPvDifficultyStatesPtr@@YAXXZ:
 	pushaq
-	mov rcx, r10
+	mov rcx, [rdx]
 	mov rdx, r8
 	sub rsp, 20h
 	call ?spriteLoaderGetPvDifficultyStatesPtrImp@@YAPEA_NII@Z

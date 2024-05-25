@@ -1,16 +1,16 @@
 #include "PvLoader.h"
 
 static constexpr size_t DIFFICULTY_COUNT = 5;
-static constexpr size_t EXTRA_COUNT = 2;
+static constexpr size_t ATTRIBUTE_COUNT = 2;
 
 struct PvState
 {
-    bool difficultyStates[DIFFICULTY_COUNT][EXTRA_COUNT]{};
+    bool difficultyStates[DIFFICULTY_COUNT][ATTRIBUTE_COUNT]{};
 };
 
 static std::unordered_map<uint32_t, PvState> pvStateMap;
 
-static FUNCTION_PTR(void*, __fastcall, getPvData, 0x1404BC520, uint32_t id, uint32_t difficulty, uint32_t isExtra);
+static FUNCTION_PTR(void*, __fastcall, getPvData, 0x1404BC570, uint32_t id, uint32_t difficulty, uint32_t attribute);
 
 HOOK(void, __fastcall, SetPvStates, 0x1590DEBF0, void* a1)
 {
@@ -20,14 +20,18 @@ HOOK(void, __fastcall, SetPvStates, 0x1590DEBF0, void* a1)
 
         for (uint32_t i = 0; i < DIFFICULTY_COUNT; i++)
         {
-            for (uint32_t j = 0; j < EXTRA_COUNT; j++)
+            for (uint32_t j = 0; j < ATTRIBUTE_COUNT; j++)
             {
-                if (getPvData(it->first, i, j) != nullptr)
-                {
-                    it->second.difficultyStates[i][j] = true;
+                auto& difficultyState = it->second.difficultyStates[i][j];
+                difficultyState = getPvData(it->first, i, j) != nullptr;
+
+                if (difficultyState)
                     hasAnyDifficulty = true;
-                }
             }
+
+            // TODO: Find out why not doing this causes a crash with songs that only have Extra Extreme
+            if (!it->second.difficultyStates[i][0] && it->second.difficultyStates[i][1])
+                it->second.difficultyStates[i][0] = true;
         }
 
         if (!hasAnyDifficulty)
@@ -39,20 +43,20 @@ HOOK(void, __fastcall, SetPvStates, 0x1590DEBF0, void* a1)
 
 HOOK(void, __fastcall, SpriteLoaderGetPvDifficultyStatesPtr, 0x1405811D0);
 
-static bool invalidState = false;
+static bool invalidAttributes[ATTRIBUTE_COUNT]{};
 
-bool* spriteLoaderGetPvDifficultyStatesPtrImp(uint32_t pvId, uint32_t difficultyMulBy1000)
+bool* spriteLoaderGetPvDifficultyStatesPtrImp(uint32_t pvId, uint32_t difficulty)
 {
     auto findResult = pvStateMap.find(pvId);
-    return findResult != pvStateMap.end() ? findResult->second.difficultyStates[difficultyMulBy1000 / 1000] : &invalidState;
+    return findResult != pvStateMap.end() ? findResult->second.difficultyStates[difficulty / 2000] : invalidAttributes;
 }
 
 HOOK(void, __fastcall, PvLoaderGetPvDifficultyState, 0x1405807B4);
 
-bool pvLoaderGetPvDifficultyStateImp(uint32_t pvId, uint32_t difficulty, uint32_t isExtra)
+bool pvLoaderGetPvDifficultyStateImp(uint32_t pvId, uint32_t difficulty, uint32_t attribute)
 {
     auto findResult = pvStateMap.find(pvId);
-    return findResult != pvStateMap.end() && findResult->second.difficultyStates[difficulty][isExtra];
+    return findResult != pvStateMap.end() && findResult->second.difficultyStates[difficulty][attribute];
 }
 
 HOOK(void, __fastcall, PvLoaderGetPvExists, 0x1405807E0);
