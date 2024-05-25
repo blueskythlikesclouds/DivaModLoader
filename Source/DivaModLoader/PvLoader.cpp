@@ -72,25 +72,20 @@ uint32_t pvLoaderParseStartImp(const char* data, size_t length)
     uint32_t lastPvId = 0;
     while (i < length) 
     {
-        if (data[i] == '#') 
-        {
-            while (i < length && data[i] != '\n')
-                i++;
-
+        // Skip whitespace at the start of line.
+        while (i < length && (data[i] == '\t' || data[i] == '\n' || data[i] == '\r' || data[i] == ' '))
             i++;
-        }
-        else if (length - i > 3 && data[i] == 'p' && data[i + 1] == 'v' && data[i + 2] == '_') 
+
+        if (length - i > 3 && data[i] == 'p' && data[i + 1] == 'v' && data[i + 2] == '_') 
         {
             i += 3;
-            size_t j = i;
-            while (j < length && data[j] != '.')
-                j++;
 
             uint32_t pvId = 0;
-            for (; i < j; i++) 
+            while(i < length && std::isdigit(data[i]))
             {
                 pvId *= 10;
-                pvId += std::clamp(data[i] - '0', 0, 9);
+                pvId += data[i] - '0';
+                i++;
             }
 
             if (pvId != lastPvId && pvId != 0)
@@ -99,16 +94,11 @@ uint32_t pvLoaderParseStartImp(const char* data, size_t length)
                 pvIdStack.push_back(pvId);
                 pvStateMap.emplace(pvId, PvState{});
             }
-
-            while (i < length && data[i] != '\n')
-                i++;
-
-            i++;
         }
-        else
-        {
+
+        // Move onto the next line.
+        while (i < length && data[i] != '\n' && data[i] != '\r')
             i++;
-        }
     }
 
     if (!pvIdStack.empty())
@@ -139,15 +129,20 @@ void PvLoader::init()
 {
     INSTALL_HOOK(SetPvStates);
 
+    // Redirect sprite loader's PV existence checks to the DML map
     WRITE_CALL(originalSpriteLoaderGetPvDifficultyStatesPtr, implOfSpriteLoaderGetPvDifficultyStatesPtr);
     WRITE_NOP(reinterpret_cast<uint8_t*>(originalSpriteLoaderGetPvDifficultyStatesPtr) + 0xC, 0x3);
-    WRITE_MEMORY(0x1405811EA, uint32_t, sizeof(bool));
 
+    // Shift 1 instead of 1000 because the extra difficulty bools are right after each other in our structure
+    WRITE_MEMORY(0x1405811EA, uint32_t, 0x1);
+
+    // Redirect PV loader's existence checks to the DML map
     WRITE_CALL(originalPvLoaderGetPvDifficultyState, implOfPvLoaderGetPvDifficultyState);
     WRITE_NOP(reinterpret_cast<uint8_t*>(originalPvLoaderGetPvDifficultyState) + 0xC, 0xA);
 
     WRITE_JUMP(originalPvLoaderGetPvExists, implOfPvLoaderGetPvExists);
 
+    // Scan the pv_db file before reading it to not waste time looking for entries that don't exist in the file
     WRITE_CALL(originalPvLoaderParseStart, implOfPvLoaderParseStart);
     WRITE_NOP(reinterpret_cast<uint8_t*>(originalPvLoaderParseStart) + 0xC, 0x3);
     
