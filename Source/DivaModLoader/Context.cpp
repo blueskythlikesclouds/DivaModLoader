@@ -88,7 +88,6 @@ void Context::init()
     StrArray::init();
     SpriteLoader::init();
     DatabaseLoader::init();
-    PvLoader::init();
 
     INSTALL_HOOK(WinMain);
 }
@@ -96,4 +95,5 @@ void Context::init()
 void Context::postInit()
 {
     CodeLoader::postInit();
+    PvLoader::init();
 }
