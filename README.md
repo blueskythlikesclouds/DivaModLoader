@@ -19,6 +19,8 @@ You can use [DIVA Mod Manager (DMM)](https://github.com/TekkaGB/DivaModManager) 
     3. Open the dropdown menu -> select from the list `dinput8.dll` -> press Add
     4. Make sure it says `dinput8(native, builtin)`. if not, press Edit and select `Native and Builtin`.
 
+Some mods may require specific versions of the Visual C++ Redistributable to be installed on your system, even though DIVA Mod Loader itself doesn't need them. To ensure full compatibility with all mods, please install [Visual C++ Redistributable Runtimes All-in-One](https://www.techpowerup.com/download/visual-c-redistributable-runtime-package-all-in-one/).
+
 ## Features
 
 ### Configuration File
@@ -29,11 +31,15 @@ You can use [DIVA Mod Manager (DMM)](https://github.com/TekkaGB/DivaModManager) 
 enabled = true
 console = false
 mods = "mods"
+priority = ["Example Mod 1", "Example Mod 2"]
 ```
 
 * **enabled**: Whether the mod loader is enabled.  
 * **console**: Whether a console window is going to be created.  
 * **mods**: The directory where mods are stored.  
+* **priority**: A list of mod folders to load, with the first mod in the array having the highest priority.
+
+The priority array is automatically set by mod managers. If you're not using a mod manager, you can delete the priority array from the config file. This will make mods load in alphabetical order from the mods folder, with the mod at the top of the list having the highest priority. This is the default behavior if you have installed DML directly from the GitHub page without a mod manager.
 
 ### Mod Loading
 
@@ -169,3 +175,5 @@ You can use different naming conventions for your functions, eg. **PreInit**, **
 The current directory is changed to where the DLL is located before any of the **Init** functions are called. This is useful if you want to use relative paths.
 
 Please refrain from executing any logic in **DllMain**, use these exported functions instead. **DllMain** has too many limitations and issues to be considered reliable.
+
+It’s recommended to statically link the runtime in your DLL. In Visual Studio, you can do this by setting `Configuration Properties -> C/C++ -> Code Generation -> Runtime Library` to `Multi-threaded (/MT)` for the release configuration and `Multi-threaded Debug (/MTd)` for the debug configuration. This ensures that your mod will load properly even if the user doesn't have the required runtime installed on their system.
