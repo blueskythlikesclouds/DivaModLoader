@@ -47,6 +47,8 @@ set(DIVAMODLOADER_SRC "${DIVAMODLOADER_SRC_ROOT}/Allocator.cpp"
 
 # Add the designated source files to DivaModLoader
 target_sources(DivaModLoader PRIVATE "${DIVAMODLOADER_SRC}")
+# Pre-compiled header
+target_precompile_headers(DivaModLoader PRIVATE "${DIVAMODLOADER_SRC_ROOT}/Pch.h")
 
 # Compile definitions for Release
 target_compile_definitions(DivaModLoader PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX _CRT_SECURE_NO_WARNINGS NDEBUG)
