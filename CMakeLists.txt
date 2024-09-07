@@ -81,7 +81,7 @@ else()
   FetchContent_Declare(
     detours
     GIT_REPOSITORY https://github.com/zombraxi/Detours.git
-    GIT_TAG d4da21b29f4ccf3892e71783dcbcdef25b1672ab # create CmakeLists.txt
+    GIT_TAG 5ae203b562985e291f1bdb8488394304cf15154e # create CmakeLists.txt
   )
   FetchContent_MakeAvailable(tomlplusplus detours)
 
