@@ -45,3 +45,4 @@ add_subdirectory("${DIVAMODLOADER_ROOT}/ThirdParty")
 
 # Some thoughts before continuing...
 # Any internal dependencies can be in an Include directory, whereas third party submoduled dependencies would be in the aptly named ThirdParty folder
+# Or actually, if a user wants to use thirdparty sourced dependencies rather than the ones hosted in this very repository, FetchContent will be used... yeah, that sounds a lot better.
