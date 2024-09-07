@@ -44,3 +44,26 @@ target_sources(DivaModLoader PRIVATE "${DIVAMODLOADER_SRC}")
 # Some thoughts before continuing...
 # Any internal dependencies can be in an Include directory, whereas third party submoduled dependencies would be in the aptly named ThirdParty folder
 # Or actually, if a user wants to use thirdparty sourced dependencies rather than the ones hosted in this very repository, FetchContent will be used... yeah, that sounds a lot better.
+
+# First-party include
+target_include_directories(DivaModLoader PRIVATE "${DIVAMODLOADER_ROOT}/Include")
+
+if(NOT FETCH_THIRDPARTY_DEPS)
+  # Use repository provided dependencies...
+  target_include_directories(DivaModLoader PRIVATE "${DIVAMODLOADER_ROOT}/Dependencies"
+                                                    "${DIVAMODLOADER_ROOT}/Dependencies/Detours/include")
+  target_link_libraries(DivaModLoader PRIVATE "${DIVAMODLOADER_ROOT}/Dependencies/Detours/lib/detours.lib"
+                                              "${DIVAMODLOADER_ROOT}/Dependencies/Detours/lib/syelog.lib")
+else()
+  # Fetch third-party dependencies from their respective repositories
+  include(FetchContent)
+
+  # DivaModLoader uses v3.1.0 (current live stable ver. is v3.4.0)
+  FetchContent_Declare(
+      tomlplusplus
+      GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+      GIT_TAG        v3.1.0
+  )
+  FetchContent_MakeAvailable(tomlplusplus)
+  target_link_libraries(DivaModLoader PRIVATE tomlplusplus::tomlplusplus)
+endif()
