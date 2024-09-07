@@ -76,6 +76,14 @@ else()
       GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
       GIT_TAG        v3.1.0
   )
-  FetchContent_MakeAvailable(tomlplusplus)
-  target_link_libraries(DivaModLoader PRIVATE tomlplusplus::tomlplusplus)
+
+  # Detours... for this one will use a private fork since Microsoft does not officially support CMake 
+  FetchContent_Declare(
+    detours
+    GIT_REPOSITORY https://github.com/zombraxi/Detours.git
+    GIT_TAG d4da21b29f4ccf3892e71783dcbcdef25b1672ab # create CmakeLists.txt
+  FetchContent_MakeAvailable(tomlplusplus detours)
+
+  # link with toml++ and detours
+  target_link_libraries(DivaModLoader PRIVATE tomlplusplus::tomlplusplus detours)
 endif()
