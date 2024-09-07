@@ -74,7 +74,7 @@ else()
   FetchContent_Declare(
       tomlplusplus
       GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
-      GIT_TAG        v3.1.0
+      GIT_TAG        v3.4.0
   )
 
   # Detours... for this one will use a private fork since Microsoft does not officially support CMake 
