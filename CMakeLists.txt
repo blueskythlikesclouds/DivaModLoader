@@ -18,7 +18,7 @@ add_library(DivaModLoader SHARED)
 
 # Static MSVC Runtime
 set_property(TARGET DivaModLoader PROPERTY
-  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
+  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 # Mod loader shall be compiled, and henceforth named: "dinput8.dll"
 # This is so that it gets statically imported upon executable load
