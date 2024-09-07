@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.28.0)
 
 option(FETCH_THIRDPARTY_DEPS "Fetch third-party dependencies (toml++, Detours) instead of using repository-provided renditions, ensuring they are compiled from source." OFF)
 
+# Allow MSVC_RUNTIME_LIBRARY
+cmake_policy(SET CMP0091 NEW)
+
 # C++ 17, project uses C++ and MASM
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -12,6 +15,10 @@ project(DivaModLoader
 
 # Mod loader is built as a DLL
 add_library(DivaModLoader SHARED)
+
+# Static MSVC Runtime
+set_property(TARGET DivaModLoader PROPERTY
+  MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
 
 # Mod loader shall be compiled, and henceforth named: "dinput8.dll"
 # This is so that it gets statically imported upon executable load
