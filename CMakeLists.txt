@@ -82,6 +82,7 @@ else()
     detours
     GIT_REPOSITORY https://github.com/zombraxi/Detours.git
     GIT_TAG d4da21b29f4ccf3892e71783dcbcdef25b1672ab # create CmakeLists.txt
+  )
   FetchContent_MakeAvailable(tomlplusplus detours)
 
   # link with toml++ and detours
