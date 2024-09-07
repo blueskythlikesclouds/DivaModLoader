@@ -6,7 +6,7 @@ You can use [DIVA Mod Manager (DMM)](https://github.com/TekkaGB/DivaModManager) 
 
 ## Installation
 
-* Download the latest version from the [Releases](https://github.com/blueskythlikesclouds/DivaModLoader/releases) page.
+* Download the latest version from the [Releases](https://github.com/blueskythlikesclouds/DivaModLoader/releases) page. Or, if you prefer, compiling from source with the instructions far below.
 * Extract everything to where **DivaMegaMix.exe** is located.
 * **dinput8.dll**, **config.toml** and **mods** must be next to this executable file.
 * Linux users (including Steam Deck) additionally need to do the following:
@@ -177,3 +177,35 @@ The current directory is changed to where the DLL is located before any of the *
 Please refrain from executing any logic in **DllMain**, use these exported functions instead. **DllMain** has too many limitations and issues to be considered reliable.
 
 It’s recommended to statically link the runtime in your DLL. In Visual Studio, you can do this by setting `Configuration Properties -> C/C++ -> Code Generation -> Runtime Library` to `Multi-threaded (/MT)` for the release configuration and `Multi-threaded Debug (/MTd)` for the debug configuration. This ensures that your mod will load properly even if the user doesn't have the required runtime installed on their system.
+
+## Compiling
+
+In order to build from source, the following prerequisite software must be installed:
+* **Visual Studio 2022** with the **Desktop Development with C++** package installed, **Git for Windows**, and **CMake Tools**.
+
+Now, clone the repository, and enter that directory.
+You can do this via **Git Bash**, which is installed by the **Git for Windows** package from the **Visual Studio Installer**.
+```
+git clone https://github.com/blueskythlikesclouds/DivaModLoader.git
+cd DivaModLoader
+```
+
+Take note of the current directory you are residing in.
+Then, open a **Developer Command Prompt** for Visual Studio by pressing your Windows (or SUPER) key and searching.
+You want either the command prompt designated for **Native x64**, or the generic one.
+Change directories into that repository that you cloned earlier...
+```
+cd PATH_TO_DIVAMODLOADER_REPO
+```
+
+Now... run the following command to configure the CMake project:
+```
+cmake -B build -A x64 -DCMAKE_BUILD_TYPE=Release -DFETCH_THIRDPARTY_DEPS=ON
+```
+Then, once configured, build the project like so:
+```
+cmake --build build --config Release
+```
+
+The mod loader, `dinput8.dll` will now be located within your relative path at `build\Release\dinput8.dll`.
+Enjoy.
