@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(DIVAMODLOADER_ROOT "${CMAKE_CURRENT_LIST_DIR}")
 project(DivaModLoader
   LANGUAGES
-    CXX, ASM_MASM)
+    CXX ASM_MASM)
 
 # Mod loader is built as a DLL
 add_library(DivaModLoader SHARED)
