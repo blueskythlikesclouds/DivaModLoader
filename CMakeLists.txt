@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.28.0)
 
+option(FETCH_THIRDPARTY_DEPS "Fetch third-party dependencies (toml++, Detours) instead of using repository-provided renditions, ensuring they are compiled from source." OFF)
+
 # C++ 17, project uses C++ and MASM
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
@@ -36,12 +38,8 @@ set(DIVAMODLOADER_SRC "${DIVAMODLOADER_SRC_ROOT}/Allocator.cpp"
                       "${DIVAMODLOADER_SRC_ROOT}/StrArray.cpp"
                       "${DIVAMODLOADER_SRC_ROOT}/StrArrayImp.asm")
 
-# include directory for Helpers.h and toml.hpp...
-# Detours will need some extra work. In particular, it is desireable that a custom CMakeLists be created for it.
-target_include_directories(DivaModLoader PRIVATE "${DIVAMODLOADER_ROOT}/Dependencies")
-
-# Load submoduled dependencies...
-add_subdirectory("${DIVAMODLOADER_ROOT}/ThirdParty")
+# Add the designated source files to DivaModLoader
+target_sources(DivaModLoader PRIVATE "${DIVAMODLOADER_SRC}")
 
 # Some thoughts before continuing...
 # Any internal dependencies can be in an Include directory, whereas third party submoduled dependencies would be in the aptly named ThirdParty folder
