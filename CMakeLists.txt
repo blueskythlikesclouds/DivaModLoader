@@ -41,6 +41,9 @@ set(DIVAMODLOADER_SRC "${DIVAMODLOADER_SRC_ROOT}/Allocator.cpp"
 # Add the designated source files to DivaModLoader
 target_sources(DivaModLoader PRIVATE "${DIVAMODLOADER_SRC}")
 
+# Compile definitions for Release
+target_compile_definitions(DivaModLoader PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX _CRT_SECURE_NO_WARNINGS NDEBUG)
+
 # Some thoughts before continuing...
 # Any internal dependencies can be in an Include directory, whereas third party submoduled dependencies would be in the aptly named ThirdParty folder
 # Or actually, if a user wants to use thirdparty sourced dependencies rather than the ones hosted in this very repository, FetchContent will be used... yeah, that sounds a lot better.
