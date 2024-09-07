@@ -46,7 +46,7 @@ set(DIVAMODLOADER_SRC "${DIVAMODLOADER_SRC_ROOT}/Allocator.cpp"
                       "${DIVAMODLOADER_SRC_ROOT}/StrArrayImp.asm")
 
 # Add the designated source files to DivaModLoader
-target_sources(DivaModLoader PRIVATE "${DIVAMODLOADER_SRC}")
+target_sources(DivaModLoader PRIVATE ${DIVAMODLOADER_SRC})
 # Pre-compiled header
 target_precompile_headers(DivaModLoader PRIVATE "${DIVAMODLOADER_SRC_ROOT}/Pch.h")
 
