@@ -45,5 +45,5 @@ jobs:
         # Artifact name
         name: DivaModLoader Release Build # optional, default is artifact
         # A file, directory or wildcard pattern that describes what to upload
-        path: ${{env.SOLUTION_FILE_PATH}}/x64/Release/dinput8.dll
+        path: ${{env.SOLUTION_FILE_PATH}}\x64\Release\DivaModLoader.dll
         # The desired behavior if no files are found using the provided path.
