@@ -12,9 +12,8 @@
 #include "Utilities.h"
 #include "PvLoader.h"
 
-#pragma comment(linker, "/export:DirectInput8Create")
 HRESULT(*originalDirectInput8Create)(HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN);
-extern "C" HRESULT DirectInput8Create(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID* ppvOut, LPUNKNOWN punkOuter)
+extern "C" __declspec(dllexport) HRESULT DirectInput8Create(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID* ppvOut, LPUNKNOWN punkOuter)
 {
     return originalDirectInput8Create(hinst, dwVersion, riidltf, ppvOut, punkOuter);
 }
