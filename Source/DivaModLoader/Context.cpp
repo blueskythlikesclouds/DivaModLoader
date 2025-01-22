@@ -12,7 +12,11 @@
 #include "Utilities.h"
 #include "PvLoader.h"
 
-#pragma comment(linker, "/EXPORT:DirectInput8Create=C:\\Windows\\System32\\dinput8.DirectInput8Create")
+HRESULT(*originalDirectInput8Create)(HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN);
+extern "C" __declspec(dllexport) HRESULT DirectInput8Create(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID* ppvOut, LPUNKNOWN punkOuter)
+{
+    return originalDirectInput8Create(hinst, dwVersion, riidltf, ppvOut, punkOuter);
+}
 
 // DllMain: Do the least amount of work possible. We don't want to run into loader locks.
 // CRT: Load mods before MM+'s CRT initializer. This lets DLL mods hook into C/C++ initializers using PreInit function.
@@ -90,6 +94,12 @@ void Context::init()
     DatabaseLoader::init();
 
     INSTALL_HOOK(WinMain);
+
+    wchar_t systemPath[MAX_PATH];
+    GetSystemDirectoryW(systemPath, MAX_PATH);
+    wcscat(systemPath, L"\\dinput8.dll");
+    HMODULE original = LoadLibraryW(systemPath);
+    originalDirectInput8Create = (HRESULT(*)(HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN))GetProcAddress(original, "DirectInput8Create");
 }
 
 void Context::postInit()
