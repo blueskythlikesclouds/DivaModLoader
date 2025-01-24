@@ -46,9 +46,9 @@ struct PvDbExSong {
     int chara[6];
     prj::string file;
     prj::string name;
-    INSERT_PADDING(0x16);
+    prj::vector<prj::string> auth;
 
-    PvDbExSong(int chara, prj::string file) : name() {
+    PvDbExSong(int chara, prj::string file) : name(), auth() {
         this->chara[0] = chara;
         this->file = file;
     }
@@ -186,7 +186,6 @@ void Cover::postInit() {
                     if (nameEn.has_value()) {
                         newEntry.name_en = *nameEn;
                     }
-                    newEntry.file = *file;
                     if (vocalDispName.has_value()) {
                         newEntry.vocal_disp_name = *vocalDispName;
                     }
@@ -196,6 +195,11 @@ void Cover::postInit() {
                     if (vocalChara.has_value()) {
                         newEntry.vocal_chara_num = chara_index_from_name(*vocalChara);
                     }
+                    else {
+                        newEntry.vocal_chara_num = 10;
+                    }
+                    newEntry.file = *file;
+
 
                     if (pendingAnotherSong.find(*pv) != pendingAnotherSong.end()) {
                         auto& pending = pendingAnotherSong[*pv];
