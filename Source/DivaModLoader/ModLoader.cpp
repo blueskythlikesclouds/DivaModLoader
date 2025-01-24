@@ -6,6 +6,7 @@
 #include "SigScan.h"
 #include "Types.h"
 #include "Utilities.h"
+#include "Cover.h"
 
 SIG_SCAN
 (
@@ -48,6 +49,8 @@ HOOK(void, __fastcall, InitRomDirectoryPaths, sigInitRomDirectoryPaths())
 
     // Initialize mount data manager prefixes for mod databases.
     DatabaseLoader::initMdataMgr(modRomDirectoryPaths);
+
+    Cover::init(modRomDirectoryPaths);
 }
 
 std::vector<std::string> ModLoader::modDirectoryPaths;

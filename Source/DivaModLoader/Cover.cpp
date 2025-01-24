@@ -5,6 +5,8 @@
 #include "Utilities.h"
 #include "Types.h"
 
+constexpr char MAGIC = 0x02;
+
 static FUNCTION_PTR(int, __fastcall, getLanguage, 0x1402C8D20);
 
 struct AnotherSongEntry {
@@ -148,9 +150,30 @@ HOOK(bool, __fastcall, PvDbCtrl, 0x1404BB290, uint64_t a1) {
     return res;
 }
 
-void Cover::postInit() {
-	for (auto& dir : ModLoader::modDirectoryPaths) {
-		const std::string dbFilePath = dir + "\\cover_db.toml";
+bool Cover::resolveModFilePath(const prj::string& filePath, prj::string& destFilePath) {
+    const size_t magicIdx0 = filePath.find(MAGIC);
+    if (magicIdx0 == std::string::npos)
+        return false;
+
+    const size_t magicIdx1 = filePath.find(MAGIC, magicIdx0 + 1);
+    if (magicIdx1 == std::string::npos)
+        return false;
+
+    const prj::string left = filePath.substr(0, magicIdx0); // folder
+    const prj::string center = filePath.substr(magicIdx0 + 1, magicIdx1 - magicIdx0 - 1); // mod folder
+    const prj::string right = filePath.substr(magicIdx1 + 1); // file name
+
+    destFilePath = center;
+    destFilePath += "/";
+    destFilePath += left;
+    destFilePath += right;
+
+    return true;
+}
+
+void Cover::init(const std::vector<std::string>& modRomDirectoryPaths) {
+	for (auto it = modRomDirectoryPaths.rbegin(); it != modRomDirectoryPaths.rend(); ++it) {
+		const std::string dbFilePath = *it + "\\cover_db.toml";
 
         toml::table coverDb;
 
@@ -198,8 +221,7 @@ void Cover::postInit() {
                     else {
                         newEntry.vocal_chara_num = 10;
                     }
-                    newEntry.file = *file;
-
+                    newEntry.file = MAGIC + *it + MAGIC + *file;
 
                     if (pendingAnotherSong.find(*pv) != pendingAnotherSong.end()) {
                         auto& pending = pendingAnotherSong[*pv];
@@ -223,7 +245,7 @@ void Cover::postInit() {
                         continue;
                     }
 
-                    PvDbExSong newPending(chara_index_from_name(*chara), prj::string(*file));
+                    PvDbExSong newPending(chara_index_from_name(*chara), prj::string(MAGIC + *it + MAGIC + *file));
 
                     if (pendingExSong.find(*pv) != pendingExSong.end()) {
                         auto& pending = pendingExSong[*pv];

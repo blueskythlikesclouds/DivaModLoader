@@ -5,6 +5,7 @@
 #include "SigScan.h"
 #include "Types.h"
 #include "Utilities.h"
+#include "Cover.h"
 
 // The game contains a list of database prefixes in the mount data manager.
 // We insert all mod directory paths into this list along with a magic value wrapping it.
@@ -51,6 +52,10 @@ HOOK(size_t, __fastcall, ResolveFilePath, readInstrPtr(sigResolveFilePath(), 0, 
     if (resolveModDatabaseFilePath(filePath, destFilePath != nullptr ? *destFilePath : filePath))
     {
         // Probably should be using GetFileAttributesW, but the game doesn't work with unicode paths anyway.
+        const auto fileAttributes = GetFileAttributesA(destFilePath != nullptr ? destFilePath->c_str() : filePath.c_str());
+        return fileAttributes != INVALID_FILE_ATTRIBUTES && !(fileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+    }
+    else if (Cover::resolveModFilePath(filePath, destFilePath != nullptr ? *destFilePath : filePath)) {
         const auto fileAttributes = GetFileAttributesA(destFilePath != nullptr ? destFilePath->c_str() : filePath.c_str());
         return fileAttributes != INVALID_FILE_ATTRIBUTES && !(fileAttributes & FILE_ATTRIBUTE_DIRECTORY);
     }
