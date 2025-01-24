@@ -7,21 +7,38 @@
 
 static FUNCTION_PTR(int, __fastcall, getLanguage, 0x1402C8D20);
 
+struct AnotherSongEntry {
+    std::string name;
+    std::string name_en;
+    std::string vocal_disp_name;
+    std::string vocal_disp_name_en;
+    std::string file;
+    int vocal_chara_num;
+
+    AnotherSongEntry() = default;
+};
+
 struct PvDbAnotherSong {
     prj::string name;
     prj::string file;
     prj::string vocalDispName;
     int vocalCharaNum;
 
-    PvDbAnotherSong() : name(), file(), vocalDispName(), vocalCharaNum() {
-        this->vocalCharaNum = 10;
-    }
-
     PvDbAnotherSong(prj::string name, prj::string file, prj::string vocalDispName, int vocalCharaNum) {
         this->name = name;
         this->file = file;
         this->vocalDispName = vocalDispName;
         this->vocalCharaNum = vocalCharaNum;
+    }
+
+    PvDbAnotherSong(AnotherSongEntry entry) {
+        if (getLanguage() == 0 || entry.name_en.length() == 0) this->name = entry.name;
+        else this->name = entry.name_en;
+        if (getLanguage() == 0 || entry.vocal_disp_name_en.length() == 0) this->vocalDispName = entry.vocal_disp_name;
+        else this->vocalDispName = entry.vocal_disp_name_en;
+
+        this->file = entry.file;
+        this->vocalCharaNum = entry.vocal_chara_num;
     }
 };
 
@@ -59,7 +76,7 @@ struct PvDbEntry {
     ~PvDbEntry() = delete;
 };
 
-std::map<int, std::vector<PvDbAnotherSong>> pendingAnotherSong;
+std::map<int, std::vector<AnotherSongEntry>> pendingAnotherSong;
 std::map<int, std::vector<PvDbExSong>> pendingExSong;
 
 int chara_index_from_name(std::string name) {
@@ -150,35 +167,42 @@ void Cover::postInit() {
                 for (auto& elem : *arr) {
                     toml::table anotherSong = *elem.as_table();
                     const auto pv = anotherSong["pv"].value<int>();
-                    auto name = anotherSong["name_en"].value<std::string>();
-                    auto vocalDispName = anotherSong["vocal_disp_name_en"].value<std::string>();
+                    const auto name = anotherSong["name"].value<std::string>();
+                    const auto nameEn = anotherSong["name_en"].value<std::string>();
+                    const auto vocalDispName = anotherSong["vocal_disp_name"].value<std::string>();
+                    const auto vocalDispNameEn = anotherSong["vocal_disp_name_en"].value<std::string>();
                     const auto vocalChara = anotherSong["vocal_chara"].value<std::string>();
                     const auto file = anotherSong["file"].value<std::string>();
 
-                    if (getLanguage() == 0 || !name.has_value()) name = anotherSong["name"].value<std::string>();
-                    if (getLanguage() == 0 || !vocalDispName.has_value()) vocalDispName = anotherSong["vocal_disp_name"].value<std::string>();
-
-                    if (!pv.has_value() || !name.has_value() || (!vocalDispName.has_value() && !vocalChara.has_value()) || !file.has_value()) {
+                    if (!pv.has_value() || (!name.has_value() && !nameEn.has_value()) || ((!vocalDispName.has_value() && !vocalDispNameEn.has_value()) && !vocalChara.has_value()) || !file.has_value()) {
                         LOG(" - Failed to load \"%s\": incomplete another_song entry", getRelativePath(dbFilePath).c_str());
                         continue;
                     }
 
-                    PvDbAnotherSong newPending;
-                    newPending.name = prj::string(*name);
-                    newPending.file = prj::string(*file);
+                    AnotherSongEntry newEntry;
+                    if (name.has_value()) {
+                        newEntry.name = *name;
+                    }
+                    if (nameEn.has_value()) {
+                        newEntry.name_en = *nameEn;
+                    }
+                    newEntry.file = *file;
                     if (vocalDispName.has_value()) {
-                        newPending.vocalDispName = prj::string(*vocalDispName);
+                        newEntry.vocal_disp_name = *vocalDispName;
+                    }
+                    if (vocalDispNameEn.has_value()) {
+                        newEntry.vocal_disp_name_en = *vocalDispNameEn;
                     }
                     if (vocalChara.has_value()) {
-                        newPending.vocalCharaNum = chara_index_from_name(*vocalChara);
+                        newEntry.vocal_chara_num = chara_index_from_name(*vocalChara);
                     }
 
                     if (pendingAnotherSong.find(*pv) != pendingAnotherSong.end()) {
                         auto& pending = pendingAnotherSong[*pv];
-                        pending.push_back(newPending);
+                        pending.push_back(newEntry);
                     }
                     else {
-                        pendingAnotherSong[*pv] = { newPending };
+                        pendingAnotherSong[*pv] = { newEntry };
                     }
                 }
             }
