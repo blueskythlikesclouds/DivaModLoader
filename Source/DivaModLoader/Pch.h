@@ -20,6 +20,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <thread>
 
 #include <Helpers.h>
 #include <toml.hpp>

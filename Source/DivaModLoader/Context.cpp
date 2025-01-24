@@ -11,6 +11,7 @@
 #include "StrArray.h"
 #include "Utilities.h"
 #include "PvLoader.h"
+#include "ThumbnailLoader.h"
 
 HRESULT(*originalDirectInput8Create)(HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN);
 extern "C" __declspec(dllexport) HRESULT DirectInput8Create(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID* ppvOut, LPUNKNOWN punkOuter)
@@ -92,6 +93,7 @@ void Context::init()
     StrArray::init();
     SpriteLoader::init();
     DatabaseLoader::init();
+    ThumbnailLoader::init();
 
     INSTALL_HOOK(WinMain);
 

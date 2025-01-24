@@ -15,6 +15,9 @@ namespace prj
     template<typename T>
     using list = std::list<T, Allocator<T>>;
 
+    template<typename K, typename T>
+    using map = std::map<K, T, std::less<K>, Allocator<std::pair<const K, T>>>;
+
     template <class T>
     struct default_delete
     {
