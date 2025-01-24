@@ -159,13 +159,11 @@ bool Cover::resolveModFilePath(const prj::string& filePath, prj::string& destFil
     if (magicIdx1 == std::string::npos)
         return false;
 
-    const prj::string left = filePath.substr(0, magicIdx0); // folder
     const prj::string center = filePath.substr(magicIdx0 + 1, magicIdx1 - magicIdx0 - 1); // mod folder
-    const prj::string right = filePath.substr(magicIdx1 + 1); // file name
+    const prj::string right = filePath.substr(magicIdx1 + 1); // file
 
     destFilePath = center;
     destFilePath += "/";
-    destFilePath += left;
     destFilePath += right;
 
     return true;
