@@ -4,10 +4,12 @@
 #include "Context.h"
 #include "Utilities.h"
 #include "Types.h"
+#include "SigScan.h"
 
 constexpr char MAGIC = 0x02;
 
-static FUNCTION_PTR(int, __fastcall, getLanguage, 0x1402C8D20);
+SIG_SCAN(sigGetLanguage, 0x1402A2FFB, "\xE8\xCC\xCC\xCC\xCC\x83\xE8\x01\x74\x7F", "x????xxxxx");
+static FUNCTION_PTR(int, __fastcall, getLanguage, readInstrPtr(sigGetLanguage(), 0, 5));
 
 struct AnotherSongEntry {
     std::string name;
@@ -117,7 +119,13 @@ int chara_index_from_name(std::string name) {
     }
 }
 
-HOOK(bool, __fastcall, PvDbCtrl, 0x1404BB290, uint64_t a1) {
+SIG_SCAN(
+    sigPvDbCtrl,
+    0x1404BB290,
+    "\x48\x89\x5C\x24\x10\x48\x89\x74\x24\x18\x48\x89\x7C\x24\x20\x55\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\xAC\x24\x70\xFC",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+);
+HOOK(bool, __fastcall, PvDbCtrl, sigPvDbCtrl(), uint64_t a1) {
     auto res = originalPvDbCtrl(a1);
     if (*(int*)(a1 + 0x68) == 0 && (pendingAnotherSong.size() > 0 || pendingExSong.size() > 0)) {
         auto pvs = (prj::vector<PvDbEntry *> *)(a1 + 0x98);
