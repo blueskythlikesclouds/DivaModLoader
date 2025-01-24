@@ -11,6 +11,7 @@
 #include "StrArray.h"
 #include "Utilities.h"
 #include "PvLoader.h"
+#include "Cover.h"
 
 HRESULT(*originalDirectInput8Create)(HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN);
 extern "C" __declspec(dllexport) HRESULT DirectInput8Create(HINSTANCE hinst, DWORD dwVersion, REFIID riidltf, LPVOID* ppvOut, LPUNKNOWN punkOuter)
@@ -106,4 +107,5 @@ void Context::postInit()
 {
     CodeLoader::postInit();
     PvLoader::init();
+    Cover::postInit();
 }
