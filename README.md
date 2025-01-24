@@ -140,6 +140,28 @@ All of the following string types are supported, and the same ID rule applies to
 
 Please note that both formats can be used at the same time in the same file.
 
+### Cover Loading
+When adding covers to songs there are several limitations in the form of conflicting pv_db entries As a solution, DML can load **cover_db.toml** files located in the root directory with entries only relevant to the mod. An example entry is as follows: 
+
+```toml
+[[another_song]]
+pv = 1
+name = "Love Is War -Rin-"
+name_en = "Love Is War -Rin-"
+# Either vocal_disp_name OR vocal_chara, for a single singer vocal_chara is reccomended
+# vocal_disp_name = "Rin"
+# vocal_disp_name_en = "Rin"
+vocal_chara = "RIN"
+file = "rom/sound/song/pv_001_rin.ogg"
+
+[[ex_song]]
+pv = 2
+chara = "RIN"
+file = "rom/sound/song/pv_002_rin.ogg"
+```
+
+The potential values for chara are as follows `MIKU, RIN, LEN, LUKA, NERU, HAKU, KAITO, MEIKO, SAKINE, TETO`
+
 ### DLL Loading
 
 DML allows you to inject your own code into the game by loading DLL files. Certain functions can be exposed in the DLLs for initialization and per frame updates.
