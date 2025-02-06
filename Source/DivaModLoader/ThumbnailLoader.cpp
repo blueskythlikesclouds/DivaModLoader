@@ -26,11 +26,11 @@ struct string_range {
 
 struct PvSpriteId {
     void* pv;
-    int set;
-    int bg[4];
-    int jk[4];
-    int logo[4];
-    int tmb[4];
+    uint32_t set;
+    uint32_t bg[4];
+    uint32_t jk[4];
+    uint32_t logo[4];
+    uint32_t tmb[4];
 };
 
 SIG_SCAN(
@@ -69,12 +69,12 @@ SIG_SCAN(
     "xxxxxxxxxxxxxx????xxxxxxxxxxx"
 );
 
-static FUNCTION_PTR(void, __fastcall, loadSprSet, readInstrPtr(sigLoadSprSet(), 0, 5), int setId, string_range& a2);
-static FUNCTION_PTR(bool, __fastcall, loadSprSetFinish, readInstrPtr(sigLoadSprSetFinish(), 0, 5), int setId);
-static FUNCTION_PTR(int&, __fastcall, getSpriteId, sigGetSpriteId(), void* a1, string_range& name);
-static FUNCTION_PTR(int&, __fastcall, getSprSetId, sigGetSprSetId(), void* a1, string_range& name);
+static FUNCTION_PTR(void, __fastcall, loadSprSet, readInstrPtr(sigLoadSprSet(), 0, 5), uint32_t setId, string_range& a2);
+static FUNCTION_PTR(bool, __fastcall, loadSprSetFinish, readInstrPtr(sigLoadSprSetFinish(), 0, 5), uint32_t setId);
+static FUNCTION_PTR(uint32_t&, __fastcall, getSpriteId, sigGetSpriteId(), void* a1, string_range& name);
+static FUNCTION_PTR(uint32_t&, __fastcall, getSprSetId, sigGetSprSetId(), void* a1, string_range& name);
 
-std::vector<int> pendingSprites;
+std::vector<uint32_t> pendingSprites;
 
 void loadSprSetWait() {
     while (pendingSprites.size() > 0) {
@@ -92,26 +92,26 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1) {
     for (auto it = sprites->begin(); it != sprites->end(); it++) {
         char buf[64];
         int length;
-        int set;
-        int spr;
+        uint32_t set;
+        uint32_t spr;
         string_range name;
 
         length = sprintf(buf, "SPR_SEL_TMB%03d", it->first);
         name = string_range(buf, length);
         set = getSprSetId(nullptr, name);
-        if (set <= 0) continue;
+        if (set == (uint32_t)-1) continue;
 
         length = sprintf(buf, "SPR_SEL_TMB%03d_TMB", it->first);
         name = string_range(buf, length);
         spr = getSpriteId(nullptr, name);
-        if (spr <= 0) continue;
+        if (spr == (uint32_t)-1) continue;
 
         for (int j = 0; j != 4; j++) it->second.tmb[j] = spr;
 
         length = sprintf(buf, "SPR_SEL_TMB%03d_TMB_EX", it->first);
         name = string_range(buf, length);
         spr = getSpriteId(nullptr, name);
-        if (spr > 0) for (int j = 2; j != 4; j++) it->second.tmb[j] = spr;
+        if (spr != (uint32_t)-1) for (int j = 2; j != 4; j++) it->second.tmb[j] = spr;
 
         name = string_range();
         loadSprSet(set, name);
