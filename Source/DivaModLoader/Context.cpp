@@ -73,6 +73,12 @@ void Context::preInit()
 
 void Context::init()
 {
+    wchar_t systemPath[MAX_PATH];
+    GetSystemDirectoryW(systemPath, MAX_PATH);
+    wcscat(systemPath, L"\\dinput8.dll");
+    HMODULE original = LoadLibraryW(systemPath);
+    originalDirectInput8Create = (HRESULT(*)(HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN))GetProcAddress(original, "DirectInput8Create");
+
     if (!Config::init())
         return;
 
@@ -94,12 +100,6 @@ void Context::init()
     DatabaseLoader::init();
 
     INSTALL_HOOK(WinMain);
-
-    wchar_t systemPath[MAX_PATH];
-    GetSystemDirectoryW(systemPath, MAX_PATH);
-    wcscat(systemPath, L"\\dinput8.dll");
-    HMODULE original = LoadLibraryW(systemPath);
-    originalDirectInput8Create = (HRESULT(*)(HINSTANCE, DWORD, REFIID, LPVOID*, LPUNKNOWN))GetProcAddress(original, "DirectInput8Create");
 }
 
 void Context::postInit()
