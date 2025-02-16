@@ -141,7 +141,7 @@ All of the following string types are supported, and the same ID rule applies to
 Please note that both formats can be used at the same time in the same file.
 
 ### Cover Loading
-When adding covers to songs there are several limitations in the form of conflicting pv_db entries As a solution, DML can load **cover_db.toml** files located in the root directory with entries only relevant to the mod. An example entry is as follows: 
+When adding covers to songs there are several limitations in the form of conflicting pv_db entries. As a solution, DML can load **cover_db.toml** files located in the root directory with entries only relevant to the mod. An example entry is as follows: 
 
 ```toml
 [[another_song]]
