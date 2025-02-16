@@ -114,6 +114,7 @@
     <ClInclude Include="PvLoader.h" />
     <ClInclude Include="SpriteLoader.h" />
     <ClInclude Include="StrArray.h" />
+    <ClInclude Include="ThumbnailLoader.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Utilities.h" />
   </ItemGroup>
@@ -135,6 +136,7 @@
     <ClCompile Include="PvLoader.cpp" />
     <ClCompile Include="SpriteLoader.cpp" />
     <ClCompile Include="StrArray.cpp" />
+    <ClCompile Include="ThumbnailLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <MASM Include="SaveDataImp.asm" />
