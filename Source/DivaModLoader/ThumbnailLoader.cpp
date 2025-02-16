@@ -105,7 +105,6 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1) {
         name = string_range(buf, length);
         spr = getSpriteId(nullptr, name);
         if (spr == (uint32_t)-1) continue;
-
         for (int j = 0; j != 4; j++) it->second.tmb[j] = spr;
 
         length = sprintf(buf, "SPR_SEL_TMB%03d_TMB_EX", it->first);
@@ -117,6 +116,7 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1) {
         loadSprSet(set, name);
         pendingSprites.push_back(set);
     }
+
     if (pendingSprites.size() > 0) {
         std::thread t(loadSprSetWait);
         t.detach();
