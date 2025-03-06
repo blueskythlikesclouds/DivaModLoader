@@ -6,7 +6,7 @@ You can use [DIVA Mod Manager](https://github.com/TekkaGB/DivaModManager), [d4m]
 
 ## Installation
 
-* Download the latest version from the [Releases](https://github.com/blueskythlikesclouds/DivaModLoader/releases) page.
+* Download the latest version from the [Releases](https://github.com/blueskythlikesclouds/DivaModLoader/releases) page. 
 * Extract everything to where **DivaMegaMix.exe** is located.
 * **dinput8.dll**, **config.toml** and **mods** must be next to this executable file.
 * Linux users (including Steam Deck) additionally need to do the following:
@@ -177,3 +177,4 @@ The current directory is changed to where the DLL is located before any of the *
 Please refrain from executing any logic in **DllMain**, use these exported functions instead. **DllMain** has too many limitations and issues to be considered reliable.
 
 It’s recommended to statically link the runtime in your DLL. In Visual Studio, you can do this by setting `Configuration Properties -> C/C++ -> Code Generation -> Runtime Library` to `Multi-threaded (/MT)` for the release configuration and `Multi-threaded Debug (/MTd)` for the debug configuration. This ensures that your mod will load properly even if the user doesn't have the required runtime installed on their system.
+
