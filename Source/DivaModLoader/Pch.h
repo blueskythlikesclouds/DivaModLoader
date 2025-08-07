@@ -21,6 +21,7 @@
 #include <unordered_map>
 #include <vector>
 #include <thread>
+#include <set>
 
 #include <Helpers.h>
 #include <toml.hpp>

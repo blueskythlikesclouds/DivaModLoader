@@ -38,6 +38,13 @@ struct PvSpriteId
     uint32_t tmb[4];
 };
 
+struct SpriteInfo {
+    uint32_t id;
+    string_range name;
+    uint16_t index;
+    uint16_t set_index;
+};
+
 SIG_SCAN
 (
     sigLoadPvSpriteIds,
@@ -65,35 +72,25 @@ SIG_SCAN
 
 SIG_SCAN
 (
-    sigGetSpriteId,
+    sigGetSpriteInfo,
     0x1405BC8F0,
     "\x41\x56\x48\x83\xEC\x30\x48\x89\x5C\x24\x40\x48\x8D\x0D\xCC\xCC\xCC\xCC\x48\x89\x7C\x24\x28\x4C\x89\x7C\x24\x20\x4C",
     "xxxxxxxxxxxxxx????xxxxxxxxxxx"
 );
 
-SIG_SCAN
-(
-    sigGetSprSetId,
-    0x1405BC770,
-    "\x40\x56\x48\x83\xEC\x30\x48\x89\x5C\x24\x40\x48\x8D\x0D\xCC\xCC\xCC\xCC\x48\x89\x7C\x24\x50\x4C\x89\x7C\x24\x20\x4C",
-    "xxxxxxxxxxxxxx????xxxxxxxxxxx"
-);
-
 static FUNCTION_PTR(void, __fastcall, loadSprSet, readInstrPtr(sigLoadSprSet(), 0, 5), uint32_t setId, string_range& a2);
 static FUNCTION_PTR(bool, __fastcall, loadSprSetFinish, readInstrPtr(sigLoadSprSetFinish(), 0, 5), uint32_t setId);
-static FUNCTION_PTR(uint32_t&, __fastcall, getSpriteId, sigGetSpriteId(), void* a1, string_range& name);
-static FUNCTION_PTR(uint32_t&, __fastcall, getSprSetId, sigGetSprSetId(), void* a1, string_range& name);
+static FUNCTION_PTR(SpriteInfo *, __fastcall, getSpriteInfo, sigGetSpriteInfo(), void* a1, string_range& name);
+static FUNCTION_PTR(uint32_t *, __fastcall, getSpriteSetByIndex, 0x1405BC680, void* a1, uint32_t index);
 
-static std::vector<uint32_t> pendingSprites;
-
-static void loadSprSetWait() 
+static void loadSprSetWait(std::set<uint32_t> pendingSets) 
 {
-    while (pendingSprites.size() > 0)
+    while (pendingSets.size() > 0)
     {
-        for (auto it = pendingSprites.begin(); it != pendingSprites.end();)
+        for (auto it = pendingSets.begin(); it != pendingSets.end();)
         {
             if (loadSprSetFinish(*it) == 0)
-                it = pendingSprites.erase(it);
+                it = pendingSets.erase(it);
             else 
                 it++;
         }
@@ -106,47 +103,47 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
 {
     originalLoadPvSpriteIds(a1);
 
+    std::set<uint32_t> pendingSets;
     auto sprites = (prj::map<int, PvSpriteId> *)(a1 + 0x330);
     for (auto it = sprites->begin(); it != sprites->end(); it++)
     {
         char buf[64];
         int length;
         uint32_t set;
-        uint32_t spr;
+        uint32_t set_ex;
+        SpriteInfo *spr;
         string_range name;
 
-        length = sprintf(buf, "SPR_SEL_TMB%03d", it->first);
+        length = sprintf(buf, "SPR_SEL_PVTMB_%03d", it->first);
         name = string_range(buf, length);
-        set = getSprSetId(nullptr, name);
-        if (set == (uint32_t)-1) 
+        spr = getSpriteInfo(nullptr, name);
+        if (spr->id == (uint32_t)-1)
             continue;
 
-        length = sprintf(buf, "SPR_SEL_TMB%03d_TMB", it->first);
-        name = string_range(buf, length);
-        spr = getSpriteId(nullptr, name);
-        if (spr == (uint32_t)-1)
-            continue;
-
-        for (int j = 0; j != 4; j++)
-            it->second.tmb[j] = spr;
-
-        length = sprintf(buf, "SPR_SEL_TMB%03d_TMB_EX", it->first);
-        name = string_range(buf, length);
-        spr = getSpriteId(nullptr, name);
-        if (spr != (uint32_t)-1)
-        {
-            for (int j = 2; j != 4; j++) 
-                it->second.tmb[j] = spr;
+        set = *getSpriteSetByIndex(nullptr, spr->set_index);
+        if (set != (uint32_t)-1 && pendingSets.find(set) == pendingSets.end()) {
+            name = string_range();
+            loadSprSet(set, name);
+            pendingSets.insert(set);
         }
 
-        name = string_range();
-        loadSprSet(set, name);
-        pendingSprites.push_back(set);
+        length = sprintf(buf, "SPR_SEL_PVTMB_%03d_EX", it->first);
+        name = string_range(buf, length);
+        spr = getSpriteInfo(nullptr, name);
+        if (spr->id != (uint32_t)-1)
+        {
+            set_ex = *getSpriteSetByIndex(nullptr, spr->set_index);
+            if (set_ex != (uint32_t)-1 && set_ex != set && pendingSets.find(set_ex) == pendingSets.end()) {
+                name = string_range();
+                loadSprSet(set, name);
+                pendingSets.insert(set);
+            }
+        }
     }
 
-    if (!pendingSprites.empty())
+    if (!pendingSets.empty())
     {
-        std::thread t(loadSprSetWait);
+        std::thread t(loadSprSetWait, pendingSets);
         t.detach();
     }
 }
