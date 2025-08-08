@@ -1,0 +1,28 @@
+name: Build DIVA Mod Loader
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up MSVC environment
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build DIVA Mod Loader
+        run: msbuild .\Source\DivaModLoader.sln /p:Configuration=Release
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DivaModLoader
+          path: .\Source\DivaModLoader\bin\Release\DivaModLoader.dll
