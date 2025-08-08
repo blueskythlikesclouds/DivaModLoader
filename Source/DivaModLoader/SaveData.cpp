@@ -259,6 +259,14 @@ SIG_SCAN
 SIG_SCAN
 (
     sigFindCstmItem,
+    0x1401D5CB0,
+    "\x81\xFA\xFF\x05\x00\x00\x77",
+    "xxxxxxx"
+);
+
+SIG_SCAN
+(
+    sigFindCstmItemGallery,
     0x1401D5DD0,
     "\x81\xFA\xFF\x05\x00\x00\x76",
     "xxxxxxx"
@@ -269,6 +277,7 @@ HOOK(Score*, __fastcall, FindOrCreateScore, sigFindOrCreateScore(), void* A1, ui
 HOOK(Score*, __fastcall, FindScore, sigFindScore(), void* A1, uint32_t pvId);
 HOOK(Module*, __fastcall, FindModule, sigFindModule(), void* A1, uint32_t moduleId);
 HOOK(CstmItem*, __fastcall, FindCstmItem, sigFindCstmItem(), void* A1, uint32_t cstmItemId);
+HOOK(CstmItem*, __fastcall, FindCstmItemGallery, sigFindCstmItemGallery(), void* A1, uint32_t cstmItemId);
 
 extern uint8_t EMPTY_SCORE_DATA[];
 
@@ -352,4 +361,5 @@ void SaveData::init()
     INSTALL_HOOK(FindScore);
     INSTALL_HOOK(FindModule);
     INSTALL_HOOK(FindCstmItem);
+    INSTALL_HOOK(FindCstmItemGallery);
 }
