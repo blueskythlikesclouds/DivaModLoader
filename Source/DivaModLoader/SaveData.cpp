@@ -21,11 +21,12 @@ struct ModuleEx // used by DML save, game's own save data doesn't store module I
     Module module;
 };
 
-struct CstmItem {
+struct CstmItem 
+{
     uint8_t unknown0;
 };
 
-struct CstmItemEx
+struct CstmItemEx  // used by DML save, game's own save data doesn't store customize item ID
 {
     uint32_t cstmItemId;
     CstmItem cstmItem;
@@ -37,7 +38,7 @@ static std::unordered_map<uint32_t, CstmItem> cstmItemMap;
 
 struct SaveDataEx
 {
-    static constexpr uint32_t MAX_VERSION = 2;
+    static constexpr uint32_t MAX_VERSION = 1; // DO NOT INCREASE THIS ANYMORE!!! Refer to LoadSaveData for the reason why.
     static constexpr char FILE_NAME[] = "DivaModLoader.dat";
 
     uint32_t version;
@@ -122,12 +123,12 @@ HOOK(void, __fastcall, LoadSaveData, sigLoadSaveData(), void* A1)
     prj::unique_ptr<uint8_t[]> data;
     size_t dataSize = 0;
 
-    if (!readSaveData(SaveDataEx::FILE_NAME, data, dataSize) || dataSize < sizeof(SaveDataEx))
+    if (!readSaveData(SaveDataEx::FILE_NAME, data, dataSize) || dataSize < (offsetof(SaveDataEx, headerSize) + sizeof(uint32_t)))
         return;
 
     const auto saveData = reinterpret_cast<SaveDataEx*>(data.get());
 
-    if (saveData->version > SaveDataEx::MAX_VERSION || saveData->headerSize > dataSize)
+    if (saveData->headerSize > dataSize)
         return;
 
     for (uint32_t i = 0; i < saveData->scoreCount; i++)
@@ -145,7 +146,10 @@ HOOK(void, __fastcall, LoadSaveData, sigLoadSaveData(), void* A1)
         }
     }
 
-    if (saveData->version >= 2)
+    // Due to the faulty version checking in old DML versions, we cannot increase
+    // the version number anymore without causing the extended save data to get erased
+    // when the user downgrades their DML. Luckily, we can utilize the header size.
+    if (saveData->headerSize > offsetof(SaveDataEx, cstmItemCount))
     {
         for (uint32_t i = 0; i < saveData->cstmItemCount; i++)
         {
