@@ -78,10 +78,18 @@ SIG_SCAN
     "xxxxxxxxxxxxxx????xxxxxxxxxxx"
 );
 
+SIG_SCAN
+(
+    sigGetSpriteSetByIndex,
+    0x1405BC680,
+"\x48\x89\x5C\x24\x08\x48\x89\x6C\x24\x10\x48\x89\x74\x24\x18\x57\x48\x83\xEC\x20\x48\x8D\x0D\xCC\xCC\xCC\xCC\x8B",
+"xxxxxxxxxxxxxxxxxxxxxxx????x"
+);
+
 static FUNCTION_PTR(void, __fastcall, loadSprSet, readInstrPtr(sigLoadSprSet(), 0, 5), uint32_t setId, string_range& a2);
 static FUNCTION_PTR(bool, __fastcall, loadSprSetFinish, readInstrPtr(sigLoadSprSetFinish(), 0, 5), uint32_t setId);
 static FUNCTION_PTR(SpriteInfo *, __fastcall, getSpriteInfo, sigGetSpriteInfo(), void* a1, string_range& name);
-static FUNCTION_PTR(uint32_t *, __fastcall, getSpriteSetByIndex, 0x1405BC680, void* a1, uint32_t index);
+static FUNCTION_PTR(uint32_t *, __fastcall, getSpriteSetByIndex, sigGetSpriteSetByIndex(), void* a1, uint32_t index);
 
 static void loadSprSetWait(std::set<uint32_t> pendingSets) 
 {
