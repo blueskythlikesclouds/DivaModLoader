@@ -21,12 +21,24 @@ struct ModuleEx // used by DML save, game's own save data doesn't store module I
     Module module;
 };
 
+struct CstmItem 
+{
+    uint8_t unknown0;
+};
+
+struct CstmItemEx  // used by DML save, game's own save data doesn't store customize item ID
+{
+    uint32_t cstmItemId;
+    CstmItem cstmItem;
+};
+
 static std::unordered_map<uint32_t, Score> scoreMap;
 static std::unordered_map<uint32_t, Module> moduleMap;
+static std::unordered_map<uint32_t, CstmItem> cstmItemMap;
 
 struct SaveDataEx
 {
-    static constexpr uint32_t MAX_VERSION = 1;
+    static constexpr uint32_t MAX_VERSION = 1; // DO NOT INCREASE THIS ANYMORE!!! Refer to LoadSaveData for the reason why.
     static constexpr char FILE_NAME[] = "DivaModLoader.dat";
 
     uint32_t version;
@@ -34,6 +46,7 @@ struct SaveDataEx
 
     uint32_t scoreCount;
     uint32_t moduleCount;
+    uint32_t cstmItemCount;
     // ...add more data in new versions as necessary
 
     Score* getScores()
@@ -44,6 +57,11 @@ struct SaveDataEx
     ModuleEx* getModules()
     {
         return reinterpret_cast<ModuleEx*>(getScores() + scoreCount); // placed right after scores
+    }
+
+    CstmItemEx* getCstmItems()
+    {
+        return reinterpret_cast<CstmItemEx*>(getModules() + moduleCount); // placed right after modules
     }
 
     // ...add more functions in new versions as necessary
@@ -105,12 +123,12 @@ HOOK(void, __fastcall, LoadSaveData, sigLoadSaveData(), void* A1)
     prj::unique_ptr<uint8_t[]> data;
     size_t dataSize = 0;
 
-    if (!readSaveData(SaveDataEx::FILE_NAME, data, dataSize) || dataSize < sizeof(SaveDataEx))
+    if (!readSaveData(SaveDataEx::FILE_NAME, data, dataSize) || dataSize < (offsetof(SaveDataEx, headerSize) + sizeof(uint32_t)))
         return;
 
     const auto saveData = reinterpret_cast<SaveDataEx*>(data.get());
 
-    if (saveData->version > SaveDataEx::MAX_VERSION || saveData->headerSize > dataSize)
+    if (saveData->headerSize > dataSize)
         return;
 
     for (uint32_t i = 0; i < saveData->scoreCount; i++)
@@ -127,6 +145,18 @@ HOOK(void, __fastcall, LoadSaveData, sigLoadSaveData(), void* A1)
             moduleMap.insert(std::make_pair(module.moduleId, module.module));
         }
     }
+
+    // Due to the faulty version checking in old DML versions, we cannot increase
+    // the version number anymore without causing the extended save data to get erased
+    // when the user downgrades their DML. Luckily, we can utilize the header size.
+    if (saveData->headerSize > offsetof(SaveDataEx, cstmItemCount))
+    {
+        for (uint32_t i = 0; i < saveData->cstmItemCount; i++)
+        {
+            auto& cstmItem = saveData->getCstmItems()[i];
+            cstmItemMap.insert(std::make_pair(cstmItem.cstmItemId, cstmItem.cstmItem));
+        }
+    }
 }
 
 SIG_SCAN
@@ -141,7 +171,7 @@ HOOK(void, __fastcall, SaveSaveData, sigSaveSaveData(), void* A1)
 {
     originalSaveSaveData(A1);
 
-    if (scoreMap.empty() && moduleMap.empty())
+    if (scoreMap.empty() && moduleMap.empty() && cstmItemMap.empty())
         return;
 
     std::vector<uint8_t> data(sizeof(SaveDataEx));
@@ -151,6 +181,7 @@ HOOK(void, __fastcall, SaveSaveData, sigSaveSaveData(), void* A1)
     saveData->headerSize = sizeof(SaveDataEx);
     saveData->scoreCount = static_cast<uint32_t>(scoreMap.size());
     saveData->moduleCount = static_cast<uint32_t>(moduleMap.size());
+    saveData->cstmItemCount = static_cast<uint32_t>(cstmItemMap.size());
 
     for (const auto& [pvId, score] : scoreMap)
     {
@@ -170,6 +201,19 @@ HOOK(void, __fastcall, SaveSaveData, sigSaveSaveData(), void* A1)
             module // module
         };
         memcpy(&data[offset], &moduleEx, sizeof(ModuleEx));
+    }
+
+    for (const auto& [cstmItemId, cstmItem] : cstmItemMap)
+    {
+        const size_t offset = data.size();
+        data.resize(offset + sizeof(CstmItemEx));
+
+        CstmItemEx cstmItemEx =
+        {
+            cstmItemId,
+            cstmItem
+        };
+        memcpy(&data[offset], &cstmItemEx, sizeof(CstmItemEx));
     }
 
     prj::string filePath;
@@ -216,10 +260,28 @@ SIG_SCAN
     "xxxxxxx"
 );
 
+SIG_SCAN
+(
+    sigFindCstmItem,
+    0x1401D5CB0,
+    "\x81\xFA\xFF\x05\x00\x00\x77",
+    "xxxxxxx"
+);
+
+SIG_SCAN
+(
+    sigFindCstmItemGallery,
+    0x1401D5DD0,
+    "\x81\xFA\xFF\x05\x00\x00\x76",
+    "xxxxxxx"
+);
+
 // See SaveDataImp.asm for implementations.
 HOOK(Score*, __fastcall, FindOrCreateScore, sigFindOrCreateScore(), void* A1, uint32_t pvId);
 HOOK(Score*, __fastcall, FindScore, sigFindScore(), void* A1, uint32_t pvId);
 HOOK(Module*, __fastcall, FindModule, sigFindModule(), void* A1, uint32_t moduleId);
+HOOK(CstmItem*, __fastcall, FindCstmItem, sigFindCstmItem(), void* A1, uint32_t cstmItemId);
+HOOK(CstmItem*, __fastcall, FindCstmItemGallery, sigFindCstmItemGallery(), void* A1, uint32_t cstmItemId);
 
 extern uint8_t EMPTY_SCORE_DATA[];
 
@@ -276,6 +338,25 @@ Module* findModuleImp(void* A1, uint32_t moduleId)
     return result;
 }
 
+CstmItem* findCstmItemImp(void* A1, uint32_t cstmItemId)
+{
+    const auto pair = cstmItemMap.find(cstmItemId);
+    if (pair != cstmItemMap.end())
+        return &pair->second;
+
+    CstmItem* result = originalFindCstmItem(A1, cstmItemId);
+
+    if (result == nullptr)
+    {
+        auto& cstmItem = cstmItemMap[cstmItemId];
+        cstmItem.unknown0 = 3;
+
+        result = &cstmItem;
+    }
+
+    return result;
+}
+
 void SaveData::init()
 {
     INSTALL_HOOK(LoadSaveData);
@@ -283,4 +364,6 @@ void SaveData::init()
     INSTALL_HOOK(FindOrCreateScore);
     INSTALL_HOOK(FindScore);
     INSTALL_HOOK(FindModule);
+    INSTALL_HOOK(FindCstmItem);
+    INSTALL_HOOK(FindCstmItemGallery);
 }
