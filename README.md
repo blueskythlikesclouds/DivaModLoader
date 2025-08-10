@@ -140,6 +140,12 @@ All of the following string types are supported, and the same ID rule applies to
 
 Please note that both formats can be used at the same time in the same file.
 
+### Mod Thumbnail Loading
+
+When adding thumbnails they always conflict as there is only ever one `spr_sel_pvtmb.farc` file. As a solution, DML can load thumbnails from other sprite sets. The set should be named as `spr_sel_pvtmb_{mod_name}.farc`.
+
+These files must have a corresponding spr_db entry which must contain the normal `SPR_SEL_PVTMB_XXX` sprite entries and DML will load the correspending set they come from.
+
 ### DLL Loading
 
 DML allows you to inject your own code into the game by loading DLL files. Certain functions can be exposed in the DLLs for initialization and per frame updates.
