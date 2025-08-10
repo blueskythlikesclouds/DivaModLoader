@@ -38,11 +38,12 @@ struct PvSpriteId
     uint32_t tmb[4];
 };
 
-struct SpriteInfo {
+struct SpriteInfo 
+{
     uint32_t id;
     string_range name;
     uint16_t index;
-    uint16_t set_index;
+    uint16_t setIndex;
 };
 
 SIG_SCAN
@@ -88,12 +89,12 @@ SIG_SCAN
 
 static FUNCTION_PTR(void, __fastcall, loadSprSet, readInstrPtr(sigLoadSprSet(), 0, 5), uint32_t setId, string_range& a2);
 static FUNCTION_PTR(bool, __fastcall, loadSprSetFinish, readInstrPtr(sigLoadSprSetFinish(), 0, 5), uint32_t setId);
-static FUNCTION_PTR(SpriteInfo *, __fastcall, getSpriteInfo, sigGetSpriteInfo(), void* a1, string_range& name);
-static FUNCTION_PTR(uint32_t *, __fastcall, getSpriteSetByIndex, sigGetSpriteSetByIndex(), void* a1, uint32_t index);
+static FUNCTION_PTR(SpriteInfo*, __fastcall, getSpriteInfo, sigGetSpriteInfo(), void* a1, string_range& name);
+static FUNCTION_PTR(uint32_t*, __fastcall, getSpriteSetByIndex, sigGetSpriteSetByIndex(), void* a1, uint32_t index);
 
 static void loadSprSetWait(std::set<uint32_t> pendingSets) 
 {
-    while (pendingSets.size() > 0)
+    while (!pendingSets.empty())
     {
         for (auto it = pendingSets.begin(); it != pendingSets.end();)
         {
@@ -115,10 +116,10 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
     auto sprites = (prj::map<int, PvSpriteId> *)(a1 + 0x330);
     for (auto it = sprites->begin(); it != sprites->end(); it++)
     {
-        char buf[64];
+        char buf[256];
         int length;
         uint32_t set;
-        uint32_t set_ex;
+        uint32_t setEx;
         SpriteInfo *spr;
         string_range name;
 
@@ -128,7 +129,7 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
         if (spr->id == (uint32_t)-1)
             continue;
 
-        set = *getSpriteSetByIndex(nullptr, spr->set_index);
+        set = *getSpriteSetByIndex(nullptr, spr->setIndex);
         if (set != (uint32_t)-1 && pendingSets.find(set) == pendingSets.end()) {
             name = string_range();
             loadSprSet(set, name);
@@ -140,18 +141,18 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
         spr = getSpriteInfo(nullptr, name);
         if (spr->id != (uint32_t)-1)
         {
-            set_ex = *getSpriteSetByIndex(nullptr, spr->set_index);
-            if (set_ex != (uint32_t)-1 && set_ex != set && pendingSets.find(set_ex) == pendingSets.end()) {
+            setEx = *getSpriteSetByIndex(nullptr, spr->setIndex);
+            if (setEx != (uint32_t)-1 && setEx != set && pendingSets.find(setEx) == pendingSets.end()) {
                 name = string_range();
-                loadSprSet(set, name);
-                pendingSets.insert(set);
+                loadSprSet(setEx, name);
+                pendingSets.insert(setEx);
             }
         }
     }
 
     if (!pendingSets.empty())
     {
-        std::thread t(loadSprSetWait, pendingSets);
+        std::thread t(loadSprSetWait, std::move(pendingSets));
         t.detach();
     }
 }
