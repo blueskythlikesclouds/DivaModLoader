@@ -130,7 +130,8 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
             continue;
 
         set = *getSpriteSetByIndex(nullptr, spr->setIndex);
-        if (set != (uint32_t)-1 && pendingSets.find(set) == pendingSets.end()) {
+        if (set != (uint32_t)-1 && pendingSets.find(set) == pendingSets.end()) 
+        {
             name = string_range();
             loadSprSet(set, name);
             pendingSets.insert(set);
@@ -142,7 +143,8 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
         if (spr->id != (uint32_t)-1)
         {
             setEx = *getSpriteSetByIndex(nullptr, spr->setIndex);
-            if (setEx != (uint32_t)-1 && setEx != set && pendingSets.find(setEx) == pendingSets.end()) {
+            if (setEx != (uint32_t)-1 && setEx != set && pendingSets.find(setEx) == pendingSets.end()) 
+            {
                 name = string_range();
                 loadSprSet(setEx, name);
                 pendingSets.insert(setEx);
