@@ -175,7 +175,9 @@ const char* getStrImp(const int id)
     if (str != strMap.end())
         return str->second.c_str();
 
-    return originalGetStr(id);
+    auto originalStr = originalGetStr(id);
+    if (originalStr == nullptr) return originalGetStr(0);
+    return originalStr;
 }
 
 const char* getModuleNameImp(const int id, const int moduleId)
