@@ -91,6 +91,14 @@ SIG_SCAN
 
 SIG_SCAN
 (
+    sigSpriteFlag6,
+    0x1405B7693,
+    "\x0F\xBA\xE8\x0C\xC1\xE0\x10",
+    "xxxxxxx"
+);
+
+SIG_SCAN
+(
     sigSpriteFlagFixup,
     0x1405BBF33,
     "\x4A\x89\x4C\x1A\x08\x41\x8B\x00\x42\x89\x44\x1A\x10\xE8\xCC\xCC\xCC\xCC\x44\x03\xC8", 
@@ -120,6 +128,8 @@ void SpriteLoader::init()
     WRITE_MEMORY((uint8_t*)sigSpriteFlag4() + 0x8, uint32_t, 0x80000000);
 
     WRITE_MEMORY((uint8_t*)sigSpriteFlag5() + 0x3, uint8_t, 31);
+
+    WRITE_MEMORY((uint8_t*)sigSpriteFlag6() + 0x3, uint8_t, 0xF);
 
     WRITE_CALL(sigSpriteFlagFixup(), spriteLoaderFixupInfoInSprite);
     WRITE_NOP((uint8_t*)sigSpriteFlagFixup() + 0xC, 1);
