@@ -26,3 +26,9 @@ jobs:
         with:
           name: DivaModLoader
           path: .\Source\DivaModLoader\bin\Release\DivaModLoader.dll
+
+      - name: Upload Artifact PDB
+        uses: actions/upload-artifact@v4
+        with:
+          name: DivaModLoader-PDB
+          path: .\Source\DivaModLoader\bin\Release\DivaModLoader.pdb
