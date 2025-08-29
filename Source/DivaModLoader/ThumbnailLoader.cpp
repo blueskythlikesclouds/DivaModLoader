@@ -100,8 +100,8 @@ static FUNCTION_PTR(bool, __fastcall, loadSprSetFinish, readInstrPtr(sigLoadSprS
 static FUNCTION_PTR(SpriteInfo*, __fastcall, getSpriteInfo, sigGetSpriteInfo(), void* a1, string_range& name);
 static FUNCTION_PTR(uint32_t*, __fastcall, getSpriteSetByIndex, sigGetSpriteSetByIndex(), void* a1, uint32_t index);
 
-const uint32_t baseSprPvTmb = 4527;
-std::set<uint32_t> pendingSets;
+constexpr uint32_t BASE_SPR_PV_TMB_ID = 4527;
+static std::set<uint32_t> pendingSets;
 
 HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
 {
@@ -124,7 +124,7 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
             continue;
 
         set = *getSpriteSetByIndex(nullptr, spr->setIndex);
-        if (set != (uint32_t)-1 && set != baseSprPvTmb && pendingSets.find(set) == pendingSets.end())
+        if (set != (uint32_t)-1 && set != BASE_SPR_PV_TMB_ID && pendingSets.find(set) == pendingSets.end())
         {
             name = string_range();
             loadSprSet(set, name);
@@ -137,7 +137,7 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
         if (spr->id != (uint32_t)-1)
         {
             setEx = *getSpriteSetByIndex(nullptr, spr->setIndex);
-            if (setEx != (uint32_t)-1 && setEx != baseSprPvTmb && setEx != set && pendingSets.find(setEx) == pendingSets.end())
+            if (setEx != (uint32_t)-1 && setEx != BASE_SPR_PV_TMB_ID && setEx != set && pendingSets.find(setEx) == pendingSets.end())
             {
                 name = string_range();
                 loadSprSet(setEx, name);
@@ -147,7 +147,8 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
     }
 }
 
-HOOK(bool, __fastcall, TaskPvDbCtrl, sigTaskPvDbCtrl(), uint64_t a1) {
+HOOK(bool, __fastcall, TaskPvDbCtrl, sigTaskPvDbCtrl(), uint64_t a1) 
+{
     for (auto it = pendingSets.begin(); it != pendingSets.end();)
     {
         if (loadSprSetFinish(*it) == 0)
