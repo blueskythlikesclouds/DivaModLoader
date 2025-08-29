@@ -144,7 +144,7 @@ Please note that both formats can be used at the same time in the same file.
 
 When adding small PV thumbnails, they always conflict as there is only ever one `spr_sel_pvtmb.farc` file. As a solution, DML can load thumbnails from other sprite sets. These sets should be named as `spr_sel_pvtmb_{mod_name}.farc`. For example, `spr_sel_pvtmb_my_amazing_mod_pack.farc`. Be sure to use distinctive names to avoid conflicts with other mods.
 
-These files must have a corresponding `spr_db` entry which must contain the normal `SPR_SEL_PVTMB_XXX` sprite entries. DML will load the corresponding set they come from. Make sure your new sprite set contains only the songs included in your mod, and that all sprite and sprite set IDs are unique. It is recommended to generate murmur hashes with [Miku Miku Model](https://github.com/blueskythlikesclouds/MikuMikuLibrary) and use them as IDs.
+These files must have a corresponding `spr_db` entry which must contain the `SPR_SEL_PVTMB_XXX` sprite entries for your modded songs. DML will load the corresponding set they come from. Make sure your new sprite set contains only the songs included in your mod, and that all sprite and sprite set IDs are unique. It is recommended to generate murmur hashes with [Miku Miku Model](https://github.com/blueskythlikesclouds/MikuMikuLibrary) and use them as IDs.
 
 ### DLL Loading
 
