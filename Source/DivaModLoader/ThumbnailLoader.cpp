@@ -87,32 +87,26 @@ SIG_SCAN
     "xxxxxxxxxxxxxxxxxxxxxxx????x"
 );
 
+SIG_SCAN
+(
+    sigTaskPvDbCtrl,
+    0x1404BB290,
+    "\x48\x89\x5C\x24\x10\x48\x89\x74\x24\x18\x48\x89\x7C\x24\x20\x55\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\xAC\x24\x70\xFC",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+);
+
 static FUNCTION_PTR(void, __fastcall, loadSprSet, readInstrPtr(sigLoadSprSet(), 0, 5), uint32_t setId, string_range& a2);
 static FUNCTION_PTR(bool, __fastcall, loadSprSetFinish, readInstrPtr(sigLoadSprSetFinish(), 0, 5), uint32_t setId);
 static FUNCTION_PTR(SpriteInfo*, __fastcall, getSpriteInfo, sigGetSpriteInfo(), void* a1, string_range& name);
 static FUNCTION_PTR(uint32_t*, __fastcall, getSpriteSetByIndex, sigGetSpriteSetByIndex(), void* a1, uint32_t index);
 
-static void loadSprSetWait(std::set<uint32_t> pendingSets) 
-{
-    while (!pendingSets.empty())
-    {
-        for (auto it = pendingSets.begin(); it != pendingSets.end();)
-        {
-            if (loadSprSetFinish(*it) == 0)
-                it = pendingSets.erase(it);
-            else 
-                it++;
-        }
-
-        std::this_thread::yield();
-    }
-}
+constexpr uint32_t BASE_SPR_PV_TMB_ID = 4527;
+static std::set<uint32_t> pendingSets;
 
 HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
 {
     originalLoadPvSpriteIds(a1);
 
-    std::set<uint32_t> pendingSets;
     auto sprites = (prj::map<int, PvSpriteId> *)(a1 + 0x330);
     for (auto it = sprites->begin(); it != sprites->end(); it++)
     {
@@ -130,7 +124,7 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
             continue;
 
         set = *getSpriteSetByIndex(nullptr, spr->setIndex);
-        if (set != (uint32_t)-1 && pendingSets.find(set) == pendingSets.end()) 
+        if (set != (uint32_t)-1 && set != BASE_SPR_PV_TMB_ID && pendingSets.find(set) == pendingSets.end())
         {
             name = string_range();
             loadSprSet(set, name);
@@ -143,7 +137,7 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
         if (spr->id != (uint32_t)-1)
         {
             setEx = *getSpriteSetByIndex(nullptr, spr->setIndex);
-            if (setEx != (uint32_t)-1 && setEx != set && pendingSets.find(setEx) == pendingSets.end()) 
+            if (setEx != (uint32_t)-1 && setEx != BASE_SPR_PV_TMB_ID && setEx != set && pendingSets.find(setEx) == pendingSets.end())
             {
                 name = string_range();
                 loadSprSet(setEx, name);
@@ -151,15 +145,23 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
             }
         }
     }
+}
 
-    if (!pendingSets.empty())
+HOOK(bool, __fastcall, TaskPvDbCtrl, sigTaskPvDbCtrl(), uint64_t a1) 
+{
+    for (auto it = pendingSets.begin(); it != pendingSets.end();)
     {
-        std::thread t(loadSprSetWait, std::move(pendingSets));
-        t.detach();
+        if (loadSprSetFinish(*it) == 0)
+            it = pendingSets.erase(it);
+        else
+            it++;
     }
+
+    return originalTaskPvDbCtrl(a1);
 }
 
 void ThumbnailLoader::init() 
 {
     INSTALL_HOOK(LoadPvSpriteIds);
+    INSTALL_HOOK(TaskPvDbCtrl);
 }
