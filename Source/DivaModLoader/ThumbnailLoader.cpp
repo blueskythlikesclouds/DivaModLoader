@@ -87,6 +87,14 @@ SIG_SCAN
     "xxxxxxxxxxxxxxxxxxxxxxx????x"
 );
 
+SIG_SCAN
+(
+    sigTaskPvDbCtrl,
+    0x1404BB290,
+    "\x48\x89\x5C\x24\x10\x48\x89\x74\x24\x18\x48\x89\x7C\x24\x20\x55\x41\x54\x41\x55\x41\x56\x41\x57\x48\x8D\xAC\x24\x70\xFC",
+    "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+);
+
 static FUNCTION_PTR(void, __fastcall, loadSprSet, readInstrPtr(sigLoadSprSet(), 0, 5), uint32_t setId, string_range& a2);
 static FUNCTION_PTR(bool, __fastcall, loadSprSetFinish, readInstrPtr(sigLoadSprSetFinish(), 0, 5), uint32_t setId);
 static FUNCTION_PTR(SpriteInfo*, __fastcall, getSpriteInfo, sigGetSpriteInfo(), void* a1, string_range& name);
@@ -139,7 +147,7 @@ HOOK(void, __fastcall, LoadPvSpriteIds, sigLoadPvSpriteIds(), uint64_t a1)
     }
 }
 
-HOOK(bool, __fastcall, TaskPvDbCtrl, 0x1404BB290, uint64_t a1) {
+HOOK(bool, __fastcall, TaskPvDbCtrl, sigTaskPvDbCtrl(), uint64_t a1) {
     for (auto it = pendingSets.begin(); it != pendingSets.end();)
     {
         if (loadSprSetFinish(*it) == 0)
